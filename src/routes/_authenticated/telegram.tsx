@@ -34,8 +34,12 @@ function TelegramPage() {
   useEffect(() => {
     (async () => {
       const { data: personal } = await supabase.from("telegram_settings").select("*").eq("user_id", me!.user.id).eq("scope", "user").maybeSingle();
-      const { data: dept } = me?.profile?.department_id ? await supabase.from("telegram_settings").select("*").eq("department_id", me!.profile!.department_id).eq("scope", "department").maybeSingle() : { data: null } as any;
-      const merged = { ...(dept?.features ?? {}), ...(personal?.features ?? {}) };
+      let deptFeatures: Record<string, boolean> = {};
+      if (me?.profile?.department_id) {
+        const { data: dept } = await supabase.from("telegram_settings").select("*").eq("department_id", me.profile.department_id).eq("scope", "department").maybeSingle();
+        deptFeatures = (dept?.features as any) ?? {};
+      }
+      const merged = { ...deptFeatures, ...((personal?.features as any) ?? {}) };
       setSettings(merged);
       setLinked(personal);
     })();

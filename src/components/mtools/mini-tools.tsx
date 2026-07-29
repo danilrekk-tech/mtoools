@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,11 +101,11 @@ export function Notes() {
 export function Pomodoro() {
   const [secs, setSecs] = useState(25 * 60);
   const [running, setRunning] = useState(false);
-  useState(() => {});
-  // simple timer using setInterval on mount when running
-  if (typeof window !== "undefined" && running && secs > 0) {
-    setTimeout(() => setSecs((s) => s - 1), 1000);
-  }
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => setSecs((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [running]);
   const m = Math.floor(secs / 60).toString().padStart(2, "0");
   const s = (secs % 60).toString().padStart(2, "0");
   return (
