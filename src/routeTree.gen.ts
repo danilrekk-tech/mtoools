@@ -17,14 +17,12 @@ import { Route as AuthenticatedTimeTrackerRouteImport } from './routes/_authenti
 import { Route as AuthenticatedTelegramRouteImport } from './routes/_authenticated/telegram'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedServicesRouteImport } from './routes/_authenticated/services'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminToolsRouteImport } from './routes/_authenticated/admin/tools'
 import { Route as AuthenticatedAdminTelegramRouteImport } from './routes/_authenticated/admin/telegram'
 import { Route as AuthenticatedAdminShiftsRouteImport } from './routes/_authenticated/admin/shifts'
-import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin/services'
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin/departments'
 
 const AuthRoute = AuthRouteImport.update({
@@ -67,11 +65,6 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedServicesRoute = AuthenticatedServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -104,12 +97,6 @@ const AuthenticatedAdminShiftsRoute =
     path: '/admin/shifts',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAdminServicesRoute =
-  AuthenticatedAdminServicesRouteImport.update({
-    id: '/admin/services',
-    path: '/admin/services',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAdminDepartmentsRoute =
   AuthenticatedAdminDepartmentsRouteImport.update({
     id: '/admin/departments',
@@ -122,14 +109,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/services': typeof AuthenticatedServicesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/telegram': typeof AuthenticatedTelegramRoute
   '/time-tracker': typeof AuthenticatedTimeTrackerRoute
   '/tools': typeof AuthenticatedToolsRoute
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
-  '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/shifts': typeof AuthenticatedAdminShiftsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
@@ -140,14 +125,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/services': typeof AuthenticatedServicesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/telegram': typeof AuthenticatedTelegramRoute
   '/time-tracker': typeof AuthenticatedTimeTrackerRoute
   '/tools': typeof AuthenticatedToolsRoute
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
-  '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/shifts': typeof AuthenticatedAdminShiftsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
@@ -160,14 +143,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/services': typeof AuthenticatedServicesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/telegram': typeof AuthenticatedTelegramRoute
   '/_authenticated/time-tracker': typeof AuthenticatedTimeTrackerRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
   '/_authenticated/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
-  '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/shifts': typeof AuthenticatedAdminShiftsRoute
   '/_authenticated/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/_authenticated/admin/tools': typeof AuthenticatedAdminToolsRoute
@@ -180,14 +161,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/dashboard'
-    | '/services'
     | '/settings'
     | '/tasks'
     | '/telegram'
     | '/time-tracker'
     | '/tools'
     | '/admin/departments'
-    | '/admin/services'
     | '/admin/shifts'
     | '/admin/telegram'
     | '/admin/tools'
@@ -198,14 +177,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/dashboard'
-    | '/services'
     | '/settings'
     | '/tasks'
     | '/telegram'
     | '/time-tracker'
     | '/tools'
     | '/admin/departments'
-    | '/admin/services'
     | '/admin/shifts'
     | '/admin/telegram'
     | '/admin/tools'
@@ -217,14 +194,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/calendar'
     | '/_authenticated/dashboard'
-    | '/_authenticated/services'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/telegram'
     | '/_authenticated/time-tracker'
     | '/_authenticated/tools'
     | '/_authenticated/admin/departments'
-    | '/_authenticated/admin/services'
     | '/_authenticated/admin/shifts'
     | '/_authenticated/admin/telegram'
     | '/_authenticated/admin/tools'
@@ -295,13 +270,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/services': {
-      id: '/_authenticated/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof AuthenticatedServicesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -344,13 +312,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminShiftsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/services': {
-      id: '/_authenticated/admin/services'
-      path: '/admin/services'
-      fullPath: '/admin/services'
-      preLoaderRoute: typeof AuthenticatedAdminServicesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin/departments': {
       id: '/_authenticated/admin/departments'
       path: '/admin/departments'
@@ -364,14 +325,12 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedServicesRoute: typeof AuthenticatedServicesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTelegramRoute: typeof AuthenticatedTelegramRoute
   AuthenticatedTimeTrackerRoute: typeof AuthenticatedTimeTrackerRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
   AuthenticatedAdminDepartmentsRoute: typeof AuthenticatedAdminDepartmentsRoute
-  AuthenticatedAdminServicesRoute: typeof AuthenticatedAdminServicesRoute
   AuthenticatedAdminShiftsRoute: typeof AuthenticatedAdminShiftsRoute
   AuthenticatedAdminTelegramRoute: typeof AuthenticatedAdminTelegramRoute
   AuthenticatedAdminToolsRoute: typeof AuthenticatedAdminToolsRoute
@@ -381,14 +340,12 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedServicesRoute: AuthenticatedServicesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTelegramRoute: AuthenticatedTelegramRoute,
   AuthenticatedTimeTrackerRoute: AuthenticatedTimeTrackerRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
   AuthenticatedAdminDepartmentsRoute: AuthenticatedAdminDepartmentsRoute,
-  AuthenticatedAdminServicesRoute: AuthenticatedAdminServicesRoute,
   AuthenticatedAdminShiftsRoute: AuthenticatedAdminShiftsRoute,
   AuthenticatedAdminTelegramRoute: AuthenticatedAdminTelegramRoute,
   AuthenticatedAdminToolsRoute: AuthenticatedAdminToolsRoute,
