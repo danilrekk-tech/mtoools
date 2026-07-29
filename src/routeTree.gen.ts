@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminToolsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminTelegramRouteImport } from './routes/_authenticated/admin/telegram'
 import { Route as AuthenticatedAdminShiftsRouteImport } from './routes/_authenticated/admin/shifts'
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin/departments'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -103,6 +104,11 @@ const AuthenticatedAdminDepartmentsRoute =
     path: '/admin/departments',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/telegram': typeof AuthenticatedTelegramRoute
   '/time-tracker': typeof AuthenticatedTimeTrackerRoute
   '/tools': typeof AuthenticatedToolsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/admin/shifts': typeof AuthenticatedAdminShiftsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/telegram': typeof AuthenticatedTelegramRoute
   '/time-tracker': typeof AuthenticatedTimeTrackerRoute
   '/tools': typeof AuthenticatedToolsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/admin/shifts': typeof AuthenticatedAdminShiftsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/telegram': typeof AuthenticatedTelegramRoute
   '/_authenticated/time-tracker': typeof AuthenticatedTimeTrackerRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/_authenticated/admin/shifts': typeof AuthenticatedAdminShiftsRoute
   '/_authenticated/admin/telegram': typeof AuthenticatedAdminTelegramRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/telegram'
     | '/time-tracker'
     | '/tools'
+    | '/admin/audit'
     | '/admin/departments'
     | '/admin/shifts'
     | '/admin/telegram'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/telegram'
     | '/time-tracker'
     | '/tools'
+    | '/admin/audit'
     | '/admin/departments'
     | '/admin/shifts'
     | '/admin/telegram'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/telegram'
     | '/_authenticated/time-tracker'
     | '/_authenticated/tools'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/admin/departments'
     | '/_authenticated/admin/shifts'
     | '/_authenticated/admin/telegram'
@@ -319,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDepartmentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -330,6 +349,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTelegramRoute: typeof AuthenticatedTelegramRoute
   AuthenticatedTimeTrackerRoute: typeof AuthenticatedTimeTrackerRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminDepartmentsRoute: typeof AuthenticatedAdminDepartmentsRoute
   AuthenticatedAdminShiftsRoute: typeof AuthenticatedAdminShiftsRoute
   AuthenticatedAdminTelegramRoute: typeof AuthenticatedAdminTelegramRoute
@@ -345,6 +365,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTelegramRoute: AuthenticatedTelegramRoute,
   AuthenticatedTimeTrackerRoute: AuthenticatedTimeTrackerRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminDepartmentsRoute: AuthenticatedAdminDepartmentsRoute,
   AuthenticatedAdminShiftsRoute: AuthenticatedAdminShiftsRoute,
   AuthenticatedAdminTelegramRoute: AuthenticatedAdminTelegramRoute,
