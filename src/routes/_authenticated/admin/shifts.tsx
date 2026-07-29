@@ -22,13 +22,13 @@ function AdminShifts() {
   const { data: shifts } = useSuspenseQuery(shiftsQuery());
   const { data: users } = useSuspenseQuery(usersQuery());
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ user_id: "", starts_at: "", ends_at: "", note: "" });
+  const [form, setForm] = useState({ user_id: "", starts_at: "", ends_at: "", title: "" });
 
   const create = async () => {
     if (!form.user_id || !form.starts_at || !form.ends_at) return toast.error("Заполните все поля");
     const { error } = await supabase.from("shifts").insert({ ...form, starts_at: new Date(form.starts_at).toISOString(), ends_at: new Date(form.ends_at).toISOString() });
     if (error) return toast.error(error.message);
-    setForm({ user_id: "", starts_at: "", ends_at: "", note: "" });
+    setForm({ user_id: "", starts_at: "", ends_at: "", title: "" });
     setOpen(false);
     qc.invalidateQueries({ queryKey: ["shifts"] });
   };
@@ -57,7 +57,7 @@ function AdminShifts() {
               </div>
               <div><Label>Начало</Label><Input type="datetime-local" value={form.starts_at} onChange={(e) => setForm({ ...form, starts_at: e.target.value })} /></div>
               <div><Label>Окончание</Label><Input type="datetime-local" value={form.ends_at} onChange={(e) => setForm({ ...form, ends_at: e.target.value })} /></div>
-              <div><Label>Заметка</Label><Input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></div>
+              <div><Label>Название</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
               <Button onClick={create} className="w-full gradient-brand text-white">Создать</Button>
             </div>
           </DialogContent>
@@ -74,7 +74,7 @@ function AdminShifts() {
                 <div className="text-xs text-muted-foreground">
                   {new Date(s.starts_at).toLocaleString("ru-RU")} → {new Date(s.ends_at).toLocaleString("ru-RU")}
                 </div>
-                {s.note && <div className="mt-1 text-xs">{s.note}</div>}
+                {s.title && <div className="mt-1 text-xs">{s.title}</div>}
               </div>
               <Button variant="ghost" size="icon" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
