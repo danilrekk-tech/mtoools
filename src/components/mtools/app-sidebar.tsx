@@ -5,13 +5,13 @@ import {
   Calendar,
   Timer,
   Wrench,
-  Link2,
   Send,
   Shield,
   Settings,
   Users,
   Building2,
   CalendarClock,
+  ScrollText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,7 +36,6 @@ const mainItems = [
   { title: "Календарь", url: "/calendar", icon: Calendar },
   { title: "Учёт времени", url: "/time-tracker", icon: Timer },
   { title: "Инструменты", url: "/tools", icon: Wrench },
-  { title: "Сервисы", url: "/services", icon: Link2 },
   { title: "Telegram-бот", url: "/telegram", icon: Send },
 ];
 
@@ -44,9 +43,9 @@ const adminItems = [
   { title: "Пользователи", url: "/admin/users", icon: Users },
   { title: "Отделы", url: "/admin/departments", icon: Building2 },
   { title: "Инструменты", url: "/admin/tools", icon: Wrench },
-  { title: "Сервисы-ссылки", url: "/admin/services", icon: Link2 },
   { title: "Смены и графики", url: "/admin/shifts", icon: CalendarClock },
   { title: "Настройки бота", url: "/admin/telegram", icon: Send },
+  { title: "Аудит-лог", url: "/admin/audit", icon: ScrollText },
 ];
 
 export function AppSidebar() {
@@ -64,8 +63,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <Link to="/" className="flex items-center gap-2 px-2 py-2">
-          <MToolsLogo className="h-8" />
+        <Link to="/" className="flex items-center gap-2 px-2 py-3">
+          <MToolsLogo className="text-2xl" />
         </Link>
       </SidebarHeader>
       <SidebarContent>
