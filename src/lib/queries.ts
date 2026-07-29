@@ -40,16 +40,6 @@ export const toolsQuery = () =>
     },
   });
 
-export const servicesQuery = () =>
-  queryOptions({
-    queryKey: ["services"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("services").select("*, department:departments(name,color)").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-
 export const usersQuery = () =>
   queryOptions({
     queryKey: ["admin", "users"],
@@ -126,5 +116,36 @@ export const activeTimeEntryQuery = () =>
       if (!uid) return null;
       const { data } = await supabase.from("time_entries").select("*").eq("user_id", uid).is("ended_at", null).order("started_at", { ascending: false }).limit(1).maybeSingle();
       return data;
+    },
+  });
+
+export const notificationsQuery = () =>
+  queryOptions({
+    queryKey: ["me", "notifications"],
+    queryFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return [];
+      const { data } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      return data ?? [];
+    },
+    refetchInterval: 30_000,
+  });
+
+export const auditLogQuery = () =>
+  queryOptions({
+    queryKey: ["admin", "audit"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      return data ?? [];
     },
   });
