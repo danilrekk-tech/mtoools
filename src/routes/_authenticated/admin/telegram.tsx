@@ -7,6 +7,13 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useServerFn } from "@tanstack/react-start";
+import { broadcastTelegram } from "@/lib/telegram.functions";
+import { Send } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/telegram")({
   head: () => ({ meta: [{ title: "Telegram · Админ · MTools" }, { name: "description", content: "Настройки бота по отделам." }] }),
@@ -47,11 +54,32 @@ function AdminTelegram() {
     toast.success("Обновлено");
   };
 
+  const broadcast = useServerFn(broadcastTelegram);
+  const [msg, setMsg] = useState("");
+  const [target, setTarget] = useState<string>("all");
+  const [sending, setSending] = useState(false);
+  const send = async () => {
+    if (!msg.trim()) return toast.error("Введите текст");
+    setSending(true);
+    try {
+      const r = await broadcast({ data: { text: msg, department_id: target === "all" ? null : target } });
+      toast.success(`Отправлено ${r.sent} из ${r.total}`);
+      setMsg("");
+    } catch (e: any) { toast.error(e.message); }
+    setSending(false);
+  };
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Telegram-бот по отделам</h1>
+      <h1 className="text-xl font-bold sm:text-2xl">Telegram-бот</h1>
+      <Tabs defaultValue="features">
+        <TabsList>
+          <TabsTrigger value="features">Функции отделов</TabsTrigger>
+          <TabsTrigger value="broadcast">Рассылка</TabsTrigger>
+        </TabsList>
+        <TabsContent value="features" className="mt-4">
       <p className="text-sm text-muted-foreground">Включённые функции применяются ко всем сотрудникам отдела по умолчанию.</p>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         {departments.map((d: any) => (
           <Card key={d.id}>
             <CardHeader className="flex flex-row items-center gap-2">
@@ -69,6 +97,33 @@ function AdminTelegram() {
           </Card>
         ))}
       </div>
+        </TabsContent>
+        <TabsContent value="broadcast" className="mt-4">
+          <Card>
+            <CardHeader><CardTitle className="text-base">Отправить сообщение</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <Label>Кому</Label>
+                <Select value={target} onValueChange={setTarget}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Всем сотрудникам</SelectItem>
+                    {departments.map((d: any) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Текст (поддерживает HTML)</Label>
+                <Textarea rows={5} value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Коллеги, ..." />
+              </div>
+              <Button onClick={send} disabled={sending} className="gradient-brand text-white">
+                <Send className="mr-2 h-4 w-4" />{sending ? "Отправка…" : "Отправить"}
+              </Button>
+              <p className="text-xs text-muted-foreground">Сообщение получат только сотрудники с привязанным Telegram.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminShiftsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin/departments'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as ApiPublicCronDispatchNotificationsRouteImport } from './routes/api/public/cron/dispatch-notifications'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -116,6 +117,12 @@ const ApiPublicTelegramWebhookRoute =
     path: '/api/public/telegram/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronDispatchNotificationsRoute =
+  ApiPublicCronDispatchNotificationsRouteImport.update({
+    id: '/api/public/cron/dispatch-notifications',
+    path: '/api/public/cron/dispatch-notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/public/cron/dispatch-notifications': typeof ApiPublicCronDispatchNotificationsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -151,6 +159,7 @@ export interface FileRoutesByTo {
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/public/cron/dispatch-notifications': typeof ApiPublicCronDispatchNotificationsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesById {
@@ -171,6 +180,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/_authenticated/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/public/cron/dispatch-notifications': typeof ApiPublicCronDispatchNotificationsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRouteTypes {
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin/telegram'
     | '/admin/tools'
     | '/admin/users'
+    | '/api/public/cron/dispatch-notifications'
     | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/admin/telegram'
     | '/admin/tools'
     | '/admin/users'
+    | '/api/public/cron/dispatch-notifications'
     | '/api/public/telegram/webhook'
   id:
     | '__root__'
@@ -228,6 +240,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/telegram'
     | '/_authenticated/admin/tools'
     | '/_authenticated/admin/users'
+    | '/api/public/cron/dispatch-notifications'
     | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -235,6 +248,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicCronDispatchNotificationsRoute: typeof ApiPublicCronDispatchNotificationsRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
 
@@ -359,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/dispatch-notifications': {
+      id: '/api/public/cron/dispatch-notifications'
+      path: '/api/public/cron/dispatch-notifications'
+      fullPath: '/api/public/cron/dispatch-notifications'
+      preLoaderRoute: typeof ApiPublicCronDispatchNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -401,6 +422,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicCronDispatchNotificationsRoute:
+    ApiPublicCronDispatchNotificationsRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport
