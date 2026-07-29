@@ -1,11 +1,16 @@
-import logoAsset from "@/assets/mtools-logo.png.asset.json";
-
-export function MToolsLogo({ className = "h-8" }: { className?: string }) {
-  return <img src={logoAsset.url} alt="MTools" className={`${className} w-auto object-contain`} />;
+export function MToolsLogo({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`inline-flex select-none items-baseline font-black leading-none tracking-tight ${className}`}
+      aria-label="MTools"
+    >
+      <span className="gradient-brand bg-clip-text text-transparent">M</span>
+      <span className="text-foreground">tools</span>
+    </span>
+  );
 }
 
 export function MToolsMark({ className = "h-8 w-8" }: { className?: string }) {
-  // Compact geometric mark inspired by logo: blue hex + green M
   return (
     <div className={`${className} relative inline-flex items-center justify-center rounded-lg gradient-brand text-white font-black`}>
       <span className="text-sm leading-none">M</span>
