@@ -28,7 +28,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <MToolsLogo className="h-9" />
+        <MToolsLogo className="text-3xl" />
         <div className="flex gap-2">
           <Button asChild variant="ghost"><Link to="/auth">Войти</Link></Button>
           <Button asChild className="gradient-brand text-white"><Link to="/auth">Начать</Link></Button>
