@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminTelegramRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminShiftsRouteImport } from './routes/_authenticated/admin/shifts'
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin/departments'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -109,6 +110,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/admin/audit',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -143,6 +151,7 @@ export interface FileRoutesByTo {
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -162,6 +171,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/_authenticated/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/admin/telegram'
     | '/admin/tools'
     | '/admin/users'
+    | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/admin/telegram'
     | '/admin/tools'
     | '/admin/users'
+    | '/api/public/telegram/webhook'
   id:
     | '__root__'
     | '/'
@@ -216,12 +228,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/telegram'
     | '/_authenticated/admin/tools'
     | '/_authenticated/admin/users'
+    | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -338,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -380,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
