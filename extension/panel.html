@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>MTools</title>
+<link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+<header>
+  <div class="logo"><span>M</span>tools</div>
+  <a class="open" id="openApp" href="#" target="_blank" rel="noopener">Открыть сервис ↗</a>
+</header>
+<nav id="tabs">
+  <button data-t="calc" class="active">Калькулятор</button>
+  <button data-t="pass">Пароли</button>
+  <button data-t="conv">Конвертер</button>
+  <button data-t="notes">Заметки</button>
+  <button data-t="pomo">Помодоро</button>
+</nav>
+<main>
+  <section id="calc" class="card">
+    <input id="calcExpr" placeholder="0" readonly />
+    <div class="res" id="calcRes">0</div>
+    <div class="grid" id="calcPad"></div>
+  </section>
+
+  <section id="pass" class="card hidden">
+    <input id="passOut" readonly placeholder="Нажмите «Сгенерировать»" />
+    <div class="row"><label class="muted">Длина <input id="passLen" type="number" min="6" max="64" value="16" /></label></div>
+    <div class="row">
+      <label class="muted"><input type="checkbox" id="pUp" checked style="width:auto"> A-Z</label>
+      <label class="muted"><input type="checkbox" id="pNum" checked style="width:auto"> 0-9</label>
+      <label class="muted"><input type="checkbox" id="pSym" checked style="width:auto"> !@#</label>
+    </div>
+    <div class="row"><button class="btn primary" id="passGen">Сгенерировать</button><button class="btn" id="passCopy">Копировать</button></div>
+  </section>
+
+  <section id="conv" class="card hidden">
+    <select id="convKind">
+      <option value="len">Длина</option><option value="mass">Масса</option><option value="temp">Температура</option>
+    </select>
+    <div class="row"><input id="convVal" type="number" value="1" /></div>
+    <div class="row"><select id="convFrom"></select><select id="convTo"></select></div>
+    <div class="res" id="convRes">—</div>
+  </section>
+
+  <section id="notes" class="card hidden">
+    <textarea id="notesArea" placeholder="Заметки сохраняются автоматически…"></textarea>
+    <div class="muted" id="notesSaved">&nbsp;</div>
+  </section>
+
+  <section id="pomo" class="card hidden">
+    <div class="timer" id="pomoTime">25:00</div>
+    <div class="row"><button class="btn primary" id="pomoStart">Старт</button><button class="btn" id="pomoReset">Сброс</button></div>
+    <div class="muted" id="pomoMode">Фокус</div>
+  </section>
+</main>
+<script src="panel.js"></script>
+</body>
+</html>

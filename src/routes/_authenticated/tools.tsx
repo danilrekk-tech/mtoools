@@ -9,8 +9,9 @@ import { DynIcon } from "@/components/mtools/icon";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Calculator, PasswordGen, UnitConverter, Notes, Pomodoro } from "@/components/mtools/mini-tools";
-import { ExternalLink } from "lucide-react";
+import { ToolDialog, launchTool, type AnyTool } from "@/components/mtools/tool-launcher";
+import { ExternalLink, Play } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const search = z.object({ tool: z.string().optional() });
 
@@ -20,21 +21,18 @@ export const Route = createFileRoute("/_authenticated/tools")({
   component: ToolsPage,
 });
 
-const InlineTools: Record<string, React.FC> = {
-  calculator: Calculator,
-  "password-gen": PasswordGen,
-  "unit-converter": UnitConverter,
-  notes: Notes,
-  pomodoro: Pomodoro,
-};
-
 function ToolsPage() {
   const qc = useQueryClient();
   const { tool } = Route.useSearch();
   const { data: dash } = useSuspenseQuery(myDashboardQuery());
+  const [activeTool, setActiveTool] = useState<AnyTool | null>(null);
 
-  const activeTool = tool ? dash?.tools.find((t) => t.slug === tool) : null;
-  const Inline = activeTool ? InlineTools[activeTool.slug] : null;
+  // Deep link (?tool=slug) opens the tool immediately, without an extra page.
+  useEffect(() => {
+    if (!tool) return;
+    const t = dash?.tools.find((x) => x.slug === tool);
+    if (t) launchTool(t as AnyTool, setActiveTool);
+  }, [tool, dash]);
 
   const setLocation = async (toolId: string, loc: "dashboard" | "sidebar" | "hidden") => {
     const { data: user } = await supabase.auth.getUser();
@@ -49,31 +47,10 @@ function ToolsPage() {
     qc.invalidateQueries({ queryKey: ["me", "dashboard"] });
   };
 
-  if (activeTool) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" onClick={() => history.back()}>← Назад</Button>
-          <h1 className="text-2xl font-bold">{activeTool.name}</h1>
-        </div>
-        {activeTool.kind === "external" && activeTool.url ? (
-          <Card><CardContent className="flex items-center justify-between p-6">
-            <div><div className="font-medium">{activeTool.name}</div><div className="text-sm text-muted-foreground">{activeTool.description}</div></div>
-            <Button asChild className="gradient-brand text-white"><a href={activeTool.url} target="_blank" rel="noreferrer">Открыть <ExternalLink className="ml-2 h-4 w-4" /></a></Button>
-          </CardContent></Card>
-        ) : Inline ? (
-          <div className="mx-auto max-w-2xl"><Inline /></div>
-        ) : (
-          <Card><CardContent className="p-6 text-sm text-muted-foreground">Инструмент подключён, но пока не имеет встроенного интерфейса.</CardContent></Card>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Инструменты</h1>
+        <h1 className="text-xl font-bold sm:text-2xl">Инструменты</h1>
         <p className="text-sm text-muted-foreground">Выберите, где отображать инструмент: на дашборде, в боковом меню или скрыть.</p>
       </div>
 
@@ -111,7 +88,10 @@ function ToolsPage() {
                         <SelectItem value="hidden">Скрыть</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button asChild size="sm" variant="outline"><a href={`/tools?tool=${t.slug}`}>Открыть</a></Button>
+                    <Button size="sm" variant="outline" onClick={() => launchTool(t as AnyTool, setActiveTool)}>
+                      {t.kind === "external" ? <ExternalLink className="mr-1 h-3 w-3" /> : <Play className="mr-1 h-3 w-3" />}
+                      Открыть
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -119,6 +99,7 @@ function ToolsPage() {
           })}
         </div>
       )}
+      <ToolDialog tool={activeTool} onClose={() => setActiveTool(null)} />
     </div>
   );
 }
