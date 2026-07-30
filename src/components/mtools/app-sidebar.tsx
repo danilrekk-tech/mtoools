@@ -12,6 +12,7 @@ import {
   Building2,
   CalendarClock,
   ScrollText,
+  Puzzle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,6 +38,7 @@ const mainItems = [
   { title: "Учёт времени", url: "/time-tracker", icon: Timer },
   { title: "Инструменты", url: "/tools", icon: Wrench },
   { title: "Telegram-бот", url: "/telegram", icon: Send },
+  { title: "Расширение Chrome", url: "/extension", icon: Puzzle },
 ];
 
 const adminItems = [
