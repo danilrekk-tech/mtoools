@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DynIcon } from "@/components/mtools/icon";
-import { Timer, Play, Square, ArrowUpRight, ListTodo, Users, Layers, LayoutGrid } from "lucide-react";
+import { Play, Square, ArrowUpRight, ListTodo, LayoutGrid, ExternalLink } from "lucide-react";
+import { ToolDialog, launchTool, type AnyTool } from "@/components/mtools/tool-launcher";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
@@ -45,6 +46,7 @@ function Dashboard() {
   const { data: active } = useSuspenseQuery(activeTimeEntryQuery());
   const now = useTicker(!!active);
   const secs = active ? Math.floor((now - new Date(active.started_at).getTime()) / 1000) : 0;
+  const [activeTool, setActiveTool] = useState<AnyTool | null>(null);
 
   const dashboardTools = useMemo(() => {
     const layoutMap = new Map((dash?.layouts ?? []).map((l) => [l.tool_id, l]));
@@ -86,7 +88,7 @@ function Dashboard() {
         <Button asChild variant="outline"><Link to="/tools"><LayoutGrid className="mr-2 h-4 w-4" />Настроить дашборд</Link></Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Рабочее время</CardTitle></CardHeader>
           <CardContent>
@@ -110,18 +112,6 @@ function Dashboard() {
             <p className="mt-1 text-xs text-muted-foreground">Доступно вам</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Ваша роль</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-1">
-              {me?.roles.map((r) => (
-                <Badge key={r} variant={r === "admin" ? "default" : "secondary"}>
-                  {r === "admin" ? "Администратор" : r === "manager" ? "Менеджер" : "Сотрудник"}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -139,17 +129,20 @@ function Dashboard() {
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {dashboardTools.map((t) => (
-                  <Link
+                  <button
                     key={t.id}
-                    to="/tools"
-                    search={{ tool: t.slug }}
-                    className="group flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-center transition hover:border-primary hover:shadow-md"
+                    type="button"
+                    onClick={() => launchTool(t as AnyTool, setActiveTool)}
+                    className="group relative flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-center transition hover:border-primary hover:shadow-md"
                   >
+                    {t.kind === "external" && (
+                      <ExternalLink className="absolute right-2 top-2 h-3 w-3 text-muted-foreground" />
+                    )}
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: (t.color ?? "#1E4FD9") + "22", color: t.color ?? "#1E4FD9" }}>
                       <DynIcon name={t.icon} className="h-5 w-5" />
                     </div>
                     <div className="text-xs font-medium">{t.name}</div>
-                  </Link>
+                  </button>
                 ))}
               </div>
             )}
@@ -175,6 +168,7 @@ function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      <ToolDialog tool={activeTool} onClose={() => setActiveTool(null)} />
     </div>
   );
 }
