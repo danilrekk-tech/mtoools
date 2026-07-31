@@ -7,7 +7,7 @@ tabs.forEach((b) =>
   b.addEventListener("click", () => {
     tabs.forEach((x) => x.classList.remove("active"));
     b.classList.add("active");
-    ["calc", "pass", "conv", "notes", "pomo"].forEach((id) =>
+    ["calc", "pass", "conv", "notes", "pomo", "text", "color", "date", "links"].forEach((id) =>
       document.getElementById(id).classList.toggle("hidden", id !== b.dataset.t),
     );
   }),
@@ -120,3 +120,141 @@ document.getElementById("pomoReset").addEventListener("click", () => {
   render();
 });
 render();
+
+
+// ---------- text tools ----------
+const txt = document.getElementById("txtIn");
+const txtStat = document.getElementById("txtStat");
+const statTxt = () => {
+  const v = txt.value;
+  txtStat.textContent = `${v.length} символов · ${v.trim() ? v.trim().split(/\s+/).length : 0} слов · ${v.split("\n").length} строк`;
+};
+txt.addEventListener("input", statTxt);
+document.querySelectorAll("[data-tx]").forEach((b) =>
+  b.addEventListener("click", () => {
+    const v = txt.value;
+    try {
+      switch (b.dataset.tx) {
+        case "upper": txt.value = v.toUpperCase(); break;
+        case "lower": txt.value = v.toLowerCase(); break;
+        case "title": txt.value = v.replace(/\p{L}[\p{L}']*/gu, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase()); break;
+        case "b64e": txt.value = btoa(unescape(encodeURIComponent(v))); break;
+        case "b64d": txt.value = decodeURIComponent(escape(atob(v.trim()))); break;
+        case "json": txt.value = JSON.stringify(JSON.parse(v), null, 2); break;
+        case "trim": txt.value = v.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim(); break;
+        case "copy": navigator.clipboard.writeText(v); break;
+        case "clear": txt.value = ""; break;
+      }
+    } catch { txt.value = "Ошибка обработки"; }
+    statTxt();
+  }),
+);
+statTxt();
+
+// ---------- color ----------
+const colHex = document.getElementById("colHex");
+const colPick = document.getElementById("colPick");
+const colOut = document.getElementById("colOut");
+const colSwatch = document.getElementById("colSwatch");
+function hexToRgb(h) {
+  const m = /^#?([\da-f]{6})$/i.exec(h.trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function renderColor() {
+  const rgb = hexToRgb(colHex.value);
+  if (!rgb) return (colOut.textContent = "Некорректный HEX");
+  const [r, g, b] = rgb;
+  const max = Math.max(r, g, b) / 255, min = Math.min(r, g, b) / 255;
+  const l = (max + min) / 2;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let hdeg = 0;
+  if (d) {
+    const rr = r / 255, gg = g / 255, bb = b / 255;
+    hdeg = max === rr ? 60 * (((gg - bb) / d) % 6) : max === gg ? 60 * ((bb - rr) / d + 2) : 60 * ((rr - gg) / d + 4);
+    if (hdeg < 0) hdeg += 360;
+  }
+  colSwatch.style.background = `rgb(${r},${g},${b})`;
+  colPick.value = "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  colOut.textContent = `rgb(${r}, ${g}, ${b}) · hsl(${Math.round(hdeg)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+}
+colHex.addEventListener("input", renderColor);
+colPick.addEventListener("input", () => { colHex.value = colPick.value.toUpperCase(); renderColor(); });
+document.getElementById("colRand").addEventListener("click", () => {
+  colHex.value = "#" + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0").toUpperCase();
+  renderColor();
+});
+document.getElementById("colCopy").addEventListener("click", () => navigator.clipboard.writeText(colOut.textContent));
+renderColor();
+
+// ---------- dates ----------
+const dA = document.getElementById("dA"), dB = document.getElementById("dB");
+const today = new Date().toISOString().slice(0, 10);
+dA.value = today; dB.value = today;
+const diff = () => {
+  const a = new Date(dA.value), b = new Date(dB.value);
+  if (isNaN(+a) || isNaN(+b)) return;
+  const days = Math.round((b - a) / 86400000);
+  document.getElementById("dDiff").textContent = `${days} дн.`;
+};
+[dA, dB].forEach((el) => el.addEventListener("change", diff));
+diff();
+document.getElementById("tsGo").addEventListener("click", () => {
+  const raw = document.getElementById("tsIn").value.trim();
+  const n = Number(raw);
+  const out = document.getElementById("tsOut");
+  if (!raw) return (out.textContent = "Сейчас: " + Math.floor(Date.now() / 1000));
+  if (isNaN(n)) return (out.textContent = "Не число");
+  out.textContent = new Date(n < 1e12 ? n * 1000 : n).toLocaleString("ru-RU");
+});
+
+// ---------- external services ----------
+const DEFAULT_LINKS = [
+  { name: "Рабочее пространство MTools", url: APP_URL + "/dashboard" },
+  { name: "Мои задачи", url: APP_URL + "/tasks" },
+  { name: "Календарь смен", url: APP_URL + "/calendar" },
+];
+const linkList = document.getElementById("linkList");
+let links = [];
+function renderLinks() {
+  linkList.innerHTML = "";
+  links.forEach((l, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.marginTop = "6px";
+    const a = document.createElement("button");
+    a.className = "btn";
+    a.style.flex = "1";
+    a.style.textAlign = "left";
+    a.textContent = l.name;
+    a.title = l.url;
+    a.addEventListener("click", () => chrome.tabs ? chrome.tabs.create({ url: l.url }) : window.open(l.url, "_blank"));
+    const del = document.createElement("button");
+    del.className = "btn";
+    del.textContent = "✕";
+    del.addEventListener("click", () => { links.splice(i, 1); saveLinks(); });
+    row.append(a, del);
+    linkList.appendChild(row);
+  });
+  if (!links.length) linkList.innerHTML = '<div class="muted">Пока нет сервисов — добавьте ниже.</div>';
+}
+function saveLinks() {
+  chrome.storage?.local.set({ mtools_links: links });
+  renderLinks();
+}
+chrome.storage?.local.get(["mtools_links"], (r) => {
+  links = r?.mtools_links ?? DEFAULT_LINKS;
+  renderLinks();
+});
+document.getElementById("lAdd").addEventListener("click", () => {
+  const name = document.getElementById("lName").value.trim();
+  let url = document.getElementById("lUrl").value.trim();
+  if (!name || !url) return;
+  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+  links.push({ name, url });
+  document.getElementById("lName").value = "";
+  document.getElementById("lUrl").value = "";
+  saveLinks();
+});

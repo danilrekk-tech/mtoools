@@ -16,6 +16,10 @@
   <button data-t="conv">Конвертер</button>
   <button data-t="notes">Заметки</button>
   <button data-t="pomo">Помодоро</button>
+  <button data-t="text">Текст</button>
+  <button data-t="color">Цвет</button>
+  <button data-t="date">Даты</button>
+  <button data-t="links">Сервисы</button>
 </nav>
 <main>
   <section id="calc" class="card">
@@ -53,6 +57,44 @@
     <div class="timer" id="pomoTime">25:00</div>
     <div class="row"><button class="btn primary" id="pomoStart">Старт</button><button class="btn" id="pomoReset">Сброс</button></div>
     <div class="muted" id="pomoMode">Фокус</div>
+  </section>
+  <section id="text" class="card hidden">
+    <textarea id="txtIn" placeholder="Введите текст…" style="min-height:120px"></textarea>
+    <div class="muted" id="txtStat">0 символов · 0 слов</div>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+      <button class="btn" data-tx="upper">ВЕРХНИЙ</button>
+      <button class="btn" data-tx="lower">нижний</button>
+      <button class="btn" data-tx="title">Заголовок</button>
+      <button class="btn" data-tx="b64e">→ Base64</button>
+      <button class="btn" data-tx="b64d">← Base64</button>
+      <button class="btn" data-tx="json">JSON</button>
+      <button class="btn" data-tx="trim">Убрать пробелы</button>
+      <button class="btn" data-tx="copy">Копировать</button>
+      <button class="btn" data-tx="clear">Очистить</button>
+    </div>
+  </section>
+
+  <section id="color" class="card hidden">
+    <div class="row"><input id="colHex" value="#1E4FD9" /><input id="colPick" type="color" value="#1E4FD9" style="width:52px;padding:2px" /></div>
+    <div id="colSwatch" style="height:64px;border-radius:10px;margin-top:10px;background:#1E4FD9"></div>
+    <div class="muted" id="colOut" style="margin-top:8px"></div>
+    <div class="row"><button class="btn" id="colRand">Случайный</button><button class="btn primary" id="colCopy">Копировать RGB</button></div>
+  </section>
+
+  <section id="date" class="card hidden">
+    <label class="muted">Дата A<input id="dA" type="date" /></label>
+    <label class="muted" style="display:block;margin-top:8px">Дата B<input id="dB" type="date" /></label>
+    <div class="res" id="dDiff">—</div>
+    <div class="muted">Unix timestamp</div>
+    <div class="row"><input id="tsIn" placeholder="1730000000" /><button class="btn" id="tsGo">→</button></div>
+    <div class="muted" id="tsOut">&nbsp;</div>
+  </section>
+
+  <section id="links" class="card hidden">
+    <div class="muted">Внешние сервисы — открываются в новой вкладке</div>
+    <div id="linkList" style="margin-top:8px"></div>
+    <div class="row"><input id="lName" placeholder="Название" /></div>
+    <div class="row"><input id="lUrl" placeholder="https://..." /><button class="btn primary" id="lAdd">+</button></div>
   </section>
 </main>
 <script src="panel.js"></script>

@@ -1,17 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { myDashboardQuery } from "@/lib/queries";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DynIcon } from "@/components/mtools/icon";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ToolDialog, launchTool, type AnyTool } from "@/components/mtools/tool-launcher";
-import { ExternalLink, Play } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ToolCard } from "@/components/mtools/tool-card";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 const search = z.object({ tool: z.string().optional() });
 
@@ -26,6 +28,8 @@ function ToolsPage() {
   const { tool } = Route.useSearch();
   const { data: dash } = useSuspenseQuery(myDashboardQuery());
   const [activeTool, setActiveTool] = useState<AnyTool | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [q, setQ] = useState("");
 
   // Deep link (?tool=slug) opens the tool immediately, without an extra page.
   useEffect(() => {
@@ -47,39 +51,49 @@ function ToolsPage() {
     qc.invalidateQueries({ queryKey: ["me", "dashboard"] });
   };
 
+  const visible = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return (dash?.tools ?? []).filter(
+      (t) => !s || t.name.toLowerCase().includes(s) || (t.description ?? "").toLowerCase().includes(s),
+    );
+  }, [dash, q]);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold sm:text-2xl">Инструменты</h1>
-        <p className="text-sm text-muted-foreground">Выберите, где отображать инструмент: на дашборде, в боковом меню или скрыть.</p>
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold sm:text-3xl">Панель инструментов</h1>
+          <p className="text-sm text-muted-foreground">Все необходимые инструменты в одном месте</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск инструмента..." className="pl-9" />
+          </div>
+          <div className="flex items-center gap-2 rounded-lg border px-3 py-2">
+            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+            <Label htmlFor="edit-mode" className="cursor-pointer text-xs">Режим настройки</Label>
+            <Switch id="edit-mode" checked={editMode} onCheckedChange={setEditMode} />
+          </div>
+        </div>
       </div>
 
-      {dash!.tools.length === 0 ? (
+      {visible.length === 0 ? (
         <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">
-          Пока нет доступных инструментов. Обратитесь к администратору для назначения.
+          {q ? "Ничего не найдено." : "Пока нет доступных инструментов. Обратитесь к администратору для назначения."}
         </CardContent></Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {dash!.tools.map((t) => {
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {visible.map((t) => {
             const layout = dash!.layouts.find((l) => l.tool_id === t.id);
             const loc = layout?.location ?? "dashboard";
             return (
-              <Card key={t.id} className="transition hover:shadow-md">
-                <CardHeader className="flex flex-row items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: (t.color ?? "#1E4FD9") + "22", color: t.color ?? "#1E4FD9" }}>
-                    <DynIcon name={t.icon} className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <CardTitle className="text-base">{t.name}</CardTitle>
-                    <div className="mt-1 text-xs text-muted-foreground">{t.description}</div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-[10px]">{t.category}</Badge>
-                    {t.kind === "external" && <Badge variant="secondary" className="text-[10px]">Внешний</Badge>}
-                  </div>
-                  <div className="flex items-center gap-2">
+              <ToolCard
+                key={t.id}
+                tool={t as AnyTool}
+                onOpen={() => launchTool(t as AnyTool, setActiveTool)}
+                footer={
+                  editMode ? (
                     <Select value={loc} onValueChange={(v) => setLocation(t.id, v as any)}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -88,13 +102,9 @@ function ToolsPage() {
                         <SelectItem value="hidden">Скрыть</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button size="sm" variant="outline" onClick={() => launchTool(t as AnyTool, setActiveTool)}>
-                      {t.kind === "external" ? <ExternalLink className="mr-1 h-3 w-3" /> : <Play className="mr-1 h-3 w-3" />}
-                      Открыть
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  ) : undefined
+                }
+              />
             );
           })}
         </div>

@@ -101,9 +101,13 @@ export const shiftsQuery = () =>
   queryOptions({
     queryKey: ["shifts"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("shifts").select("*, user:profiles!shifts_user_id_fkey(full_name)").order("starts_at");
+      const [{ data, error }, { data: profiles }] = await Promise.all([
+        supabase.from("shifts").select("*").order("starts_at"),
+        supabase.from("profiles").select("id, full_name"),
+      ]);
       if (error) throw error;
-      return data ?? [];
+      const names = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
+      return (data ?? []).map((s) => ({ ...s, user: { full_name: names.get(s.user_id) ?? null } }));
     },
   });
 
