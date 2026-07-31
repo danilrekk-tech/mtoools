@@ -4,8 +4,11 @@ import { profileQuery, myDashboardQuery, tasksQuery, activeTimeEntryQuery } from
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DynIcon } from "@/components/mtools/icon";
-import { Play, Square, ArrowUpRight, ListTodo, LayoutGrid, ExternalLink } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ToolCard } from "@/components/mtools/tool-card";
+import { Play, Square, ArrowUpRight, ListTodo, LayoutGrid, SlidersHorizontal } from "lucide-react";
 import { ToolDialog, launchTool, type AnyTool } from "@/components/mtools/tool-launcher";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -47,6 +50,7 @@ function Dashboard() {
   const now = useTicker(!!active);
   const secs = active ? Math.floor((now - new Date(active.started_at).getTime()) / 1000) : 0;
   const [activeTool, setActiveTool] = useState<AnyTool | null>(null);
+  const [editMode, setEditMode] = useState(false);
 
   const dashboardTools = useMemo(() => {
     const layoutMap = new Map((dash?.layouts ?? []).map((l) => [l.tool_id, l]));
@@ -57,6 +61,14 @@ function Dashboard() {
       })
       .sort((a, b) => (layoutMap.get(a.id)?.position ?? 0) - (layoutMap.get(b.id)?.position ?? 0));
   }, [dash]);
+
+  const setLocation = async (toolId: string, loc: "dashboard" | "sidebar" | "hidden") => {
+    const existing = dash?.layouts.find((l) => l.tool_id === toolId);
+    if (existing) await supabase.from("dashboard_layouts").update({ location: loc }).eq("id", existing.id);
+    else await supabase.from("dashboard_layouts").insert({ user_id: me!.user.id, tool_id: toolId, location: loc });
+    toast.success("Размещение обновлено");
+    qc.invalidateQueries({ queryKey: ["me", "dashboard"] });
+  };
 
   const toggleTimer = async () => {
     if (active) {
@@ -114,40 +126,52 @@ function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2"><LayoutGrid className="h-4 w-4" /> Мои инструменты</CardTitle>
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="flex items-center gap-2 text-lg font-bold"><LayoutGrid className="h-4 w-4" /> Мои инструменты</h2>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-lg border px-3 py-2">
+              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="dash-edit" className="cursor-pointer text-xs">Режим настройки</Label>
+              <Switch id="dash-edit" checked={editMode} onCheckedChange={setEditMode} />
+            </div>
             <Button asChild size="sm" variant="ghost"><Link to="/tools">Все <ArrowUpRight className="ml-1 h-3 w-3" /></Link></Button>
-          </CardHeader>
-          <CardContent>
-            {dashboardTools.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-                Инструменты не назначены. Обратитесь к администратору или перейдите в{" "}
-                <Link to="/tools" className="text-primary hover:underline">каталог</Link>.
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                {dashboardTools.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => launchTool(t as AnyTool, setActiveTool)}
-                    className="group relative flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-center transition hover:border-primary hover:shadow-md"
-                  >
-                    {t.kind === "external" && (
-                      <ExternalLink className="absolute right-2 top-2 h-3 w-3 text-muted-foreground" />
-                    )}
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: (t.color ?? "#1E4FD9") + "22", color: t.color ?? "#1E4FD9" }}>
-                      <DynIcon name={t.icon} className="h-5 w-5" />
-                    </div>
-                    <div className="text-xs font-medium">{t.name}</div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        {(editMode ? dash?.tools ?? [] : dashboardTools).length === 0 ? (
+          <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+            Инструменты не назначены. Обратитесь к администратору или перейдите в{" "}
+            <Link to="/tools" className="text-primary hover:underline">каталог</Link>.
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {(editMode ? dash!.tools : dashboardTools).map((t) => (
+              <ToolCard
+                key={t.id}
+                tool={t as AnyTool}
+                onOpen={() => launchTool(t as AnyTool, setActiveTool)}
+                footer={
+                  editMode ? (
+                    <Select
+                      value={dash!.layouts.find((l) => l.tool_id === t.id)?.location ?? "dashboard"}
+                      onValueChange={(v) => setLocation(t.id, v as any)}
+                    >
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dashboard">На дашборде</SelectItem>
+                        <SelectItem value="sidebar">В боковом меню</SelectItem>
+                        <SelectItem value="hidden">Скрыть</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : undefined
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="grid gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2"><ListTodo className="h-4 w-4" /> Задачи на сегодня</CardTitle>
