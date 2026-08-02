@@ -53,7 +53,7 @@ export const Route = createFileRoute("/api/public/extension/sync")({
         const { supabaseAdmin, profile } = await loadUser(parsed.data.token);
         if (!profile) return json({ error: "not found" }, 404);
         const merged = { ...(profile.ui_prefs as Record<string, unknown> ?? {}), ...parsed.data.prefs };
-        await supabaseAdmin.from("profiles").update({ ui_prefs: merged }).eq("id", profile.id);
+        await supabaseAdmin.from("profiles").update({ ui_prefs: merged as never }).eq("id", profile.id);
         return json({ ok: true, prefs: merged });
       },
     },
