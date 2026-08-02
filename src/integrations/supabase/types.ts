@@ -178,6 +178,7 @@ export type Database = {
           created_at: string
           department_id: string | null
           email: string
+          extension_token: string | null
           full_name: string | null
           id: string
           is_active: boolean
@@ -186,6 +187,7 @@ export type Database = {
           telegram_link_code: string | null
           telegram_username: string | null
           timezone: string | null
+          ui_prefs: Json
           updated_at: string
         }
         Insert: {
@@ -193,6 +195,7 @@ export type Database = {
           created_at?: string
           department_id?: string | null
           email: string
+          extension_token?: string | null
           full_name?: string | null
           id: string
           is_active?: boolean
@@ -201,6 +204,7 @@ export type Database = {
           telegram_link_code?: string | null
           telegram_username?: string | null
           timezone?: string | null
+          ui_prefs?: Json
           updated_at?: string
         }
         Update: {
@@ -208,6 +212,7 @@ export type Database = {
           created_at?: string
           department_id?: string | null
           email?: string
+          extension_token?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean
@@ -216,6 +221,7 @@ export type Database = {
           telegram_link_code?: string | null
           telegram_username?: string | null
           timezone?: string | null
+          ui_prefs?: Json
           updated_at?: string
         }
         Relationships: [
@@ -405,6 +411,7 @@ export type Database = {
           created_at: string
           description: string | null
           icon: string | null
+          icon_mode: string
           id: string
           is_active: boolean
           kind: string
@@ -419,6 +426,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           icon?: string | null
+          icon_mode?: string
           id?: string
           is_active?: boolean
           kind?: string
@@ -433,6 +441,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           icon?: string | null
+          icon_mode?: string
           id?: string
           is_active?: boolean
           kind?: string
