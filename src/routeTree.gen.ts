@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminShiftsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin/departments'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as ApiPublicExtensionSyncRouteImport } from './routes/api/public/extension/sync'
 import { Route as ApiPublicCronDispatchNotificationsRouteImport } from './routes/api/public/cron/dispatch-notifications'
 
 const AuthRoute = AuthRouteImport.update({
@@ -123,6 +124,11 @@ const ApiPublicTelegramWebhookRoute =
     path: '/api/public/telegram/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicExtensionSyncRoute = ApiPublicExtensionSyncRouteImport.update({
+  id: '/api/public/extension/sync',
+  path: '/api/public/extension/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronDispatchNotificationsRoute =
   ApiPublicCronDispatchNotificationsRouteImport.update({
     id: '/api/public/cron/dispatch-notifications',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/cron/dispatch-notifications': typeof ApiPublicCronDispatchNotificationsRoute
+  '/api/public/extension/sync': typeof ApiPublicExtensionSyncRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/cron/dispatch-notifications': typeof ApiPublicCronDispatchNotificationsRoute
+  '/api/public/extension/sync': typeof ApiPublicExtensionSyncRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesById {
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/tools': typeof AuthenticatedAdminToolsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/public/cron/dispatch-notifications': typeof ApiPublicCronDispatchNotificationsRoute
+  '/api/public/extension/sync': typeof ApiPublicExtensionSyncRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRouteTypes {
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/admin/tools'
     | '/admin/users'
     | '/api/public/cron/dispatch-notifications'
+    | '/api/public/extension/sync'
     | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/admin/tools'
     | '/admin/users'
     | '/api/public/cron/dispatch-notifications'
+    | '/api/public/extension/sync'
     | '/api/public/telegram/webhook'
   id:
     | '__root__'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/tools'
     | '/_authenticated/admin/users'
     | '/api/public/cron/dispatch-notifications'
+    | '/api/public/extension/sync'
     | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiPublicCronDispatchNotificationsRoute: typeof ApiPublicCronDispatchNotificationsRoute
+  ApiPublicExtensionSyncRoute: typeof ApiPublicExtensionSyncRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
 
@@ -392,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/extension/sync': {
+      id: '/api/public/extension/sync'
+      path: '/api/public/extension/sync'
+      fullPath: '/api/public/extension/sync'
+      preLoaderRoute: typeof ApiPublicExtensionSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/dispatch-notifications': {
       id: '/api/public/cron/dispatch-notifications'
       path: '/api/public/cron/dispatch-notifications'
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiPublicCronDispatchNotificationsRoute:
     ApiPublicCronDispatchNotificationsRoute,
+  ApiPublicExtensionSyncRoute: ApiPublicExtensionSyncRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport

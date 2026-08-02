@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Chrome, PanelRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Download, Chrome, PanelRight, RefreshCw, Copy } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { profileQuery } from "@/lib/queries";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/extension")({
@@ -28,6 +31,8 @@ const steps = [
 ];
 
 function ExtensionPage() {
+  const { data: me } = useSuspenseQuery(profileQuery());
+  const token = (me?.profile as { extension_token?: string } | null)?.extension_token ?? "";
   const download = () => {
     fetch("/mtools-extension.zip")
       .then((r) => {
@@ -57,17 +62,45 @@ function ExtensionPage() {
         <CardContent className="grid gap-4 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="gradient-brand text-white">v1.1.0</Badge>
+              <Badge className="gradient-brand text-white">v1.2.0</Badge>
               <Badge variant="outline">Manifest V3</Badge>
               <Badge variant="outline">Chrome · Edge · Brave · Arc</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Калькулятор, генератор паролей, конвертер величин, заметки с автосохранением и таймер помодоро.
+              Калькулятор, пароли, конвертер, заметки, помодоро, текст, цвет, даты — плюс ваши внутренние
+              инструменты и внешние сервисы с иконками и синхронизацией через аккаунт.
             </p>
           </div>
           <Button onClick={download} className="gradient-brand text-white">
             <Download className="mr-2 h-4 w-4" /> Скачать расширение
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <RefreshCw className="h-4 w-4" /> Синхронизация между устройствами
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <p>
+            Вставьте ключ во вкладку «Сервисы» расширения — панель подтянет ваши инструменты, ссылки,
+            заметки и выбранный режим на любом устройстве.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input readOnly value={token} className="font-mono text-xs" />
+            <Button
+              variant="secondary"
+              onClick={() => {
+                navigator.clipboard.writeText(token);
+                toast.success("Ключ скопирован");
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" /> Копировать
+            </Button>
+          </div>
+          <p className="text-xs">Не передавайте ключ третьим лицам — он открывает доступ к вашему списку инструментов.</p>
         </CardContent>
       </Card>
 
