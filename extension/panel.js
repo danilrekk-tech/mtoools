@@ -210,6 +210,79 @@ document.getElementById("tsGo").addEventListener("click", () => {
   out.textContent = new Date(n < 1e12 ? n * 1000 : n).toLocaleString("ru-RU");
 });
 
+// ---------- account sync ----------
+const API = APP_URL + "/api/public/extension/sync";
+let token = "";
+let prefs = {};
+const syncState = document.getElementById("syncState");
+const remoteList = document.getElementById("remoteList");
+
+function iconUrl(t) {
+  if (t.kind === "external" && t.url) {
+    try { return "https://www.google.com/s2/favicons?domain=" + new URL(t.url).hostname + "&sz=64"; } catch { return null; }
+  }
+  return null;
+}
+function openUrl(url) { chrome.tabs ? chrome.tabs.create({ url }) : window.open(url, "_blank"); }
+
+function renderRemote(tools) {
+  remoteList.innerHTML = "";
+  if (!tools || !tools.length) { remoteList.innerHTML = '<div class="muted">Нет доступных инструментов.</div>'; return; }
+  tools.forEach((t) => {
+    const b = document.createElement("button");
+    b.className = "btn tool";
+    b.title = t.description || t.name;
+    const color = t.color || "#1E4FD9";
+    b.style.borderColor = color + "55";
+    b.style.background = "linear-gradient(135deg," + color + "26," + color + "0a)";
+    const img = iconUrl(t);
+    b.innerHTML = (img ? '<img src="' + img + '" width="16" height="16" />' : '<span class="dot" style="background:' + color + '"></span>') +
+      "<span>" + t.name + "</span>" + (t.kind === "external" ? '<span class="muted">↗</span>' : "");
+    b.addEventListener("click", () => {
+      if (t.kind === "external" && t.url) return openUrl(t.url);
+      openUrl(APP_URL + "/tools?tool=" + encodeURIComponent(t.slug));
+    });
+    remoteList.appendChild(b);
+  });
+}
+
+async function pullSync() {
+  if (!token) return;
+  syncState.textContent = "Синхронизация…";
+  try {
+    const r = await fetch(API + "?token=" + encodeURIComponent(token));
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || r.status);
+    prefs = j.prefs || {};
+    renderRemote(j.tools);
+    if (Array.isArray(prefs.links)) { links = prefs.links; renderLinks(); }
+    if (typeof prefs.notes === "string" && !document.getElementById("notesArea").value) {
+      document.getElementById("notesArea").value = prefs.notes;
+    }
+    if (prefs.tab) { const b = document.querySelector('#tabs button[data-t="' + prefs.tab + '"]'); if (b) b.click(); }
+    syncState.textContent = "Синхронизировано" + (j.user?.name ? " · " + j.user.name : "");
+  } catch (e) {
+    syncState.textContent = "Ошибка синхронизации: " + e.message;
+  }
+}
+async function pushSync(patch) {
+  if (!token) return;
+  prefs = { ...prefs, ...patch };
+  try {
+    await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, prefs: patch }) });
+  } catch {}
+}
+const tokenInput = document.getElementById("syncToken");
+document.getElementById("syncGo").addEventListener("click", () => {
+  token = tokenInput.value.trim();
+  chrome.storage?.local.set({ mtools_token: token });
+  pullSync();
+});
+chrome.storage?.local.get(["mtools_token"], (r) => {
+  if (r?.mtools_token) { token = r.mtools_token; tokenInput.value = token; pullSync(); }
+});
+tabs.forEach((b) => b.addEventListener("click", () => pushSync({ tab: b.dataset.t })));
+
 // ---------- external services ----------
 const DEFAULT_LINKS = [
   { name: "Рабочее пространство MTools", url: APP_URL + "/dashboard" },
@@ -242,6 +315,7 @@ function renderLinks() {
 }
 function saveLinks() {
   chrome.storage?.local.set({ mtools_links: links });
+  pushSync({ links });
   renderLinks();
 }
 chrome.storage?.local.get(["mtools_links"], (r) => {
