@@ -1,10 +1,11 @@
-import { DynIcon } from "@/components/mtools/icon";
+import { ToolIcon } from "@/components/mtools/icon";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import type { AnyTool } from "@/components/mtools/tool-launcher";
 
 export type ToolLike = AnyTool & {
   icon?: string | null;
+  icon_mode?: string | null;
   color?: string | null;
   category?: string | null;
 };
@@ -38,7 +39,7 @@ export function ToolCard({
         className="pointer-events-none relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-sm"
         style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}bb)` }}
       >
-        <DynIcon name={tool.icon} className="h-7 w-7" />
+        <ToolIcon icon={tool.icon} iconMode={tool.icon_mode} url={tool.url} className="h-7 w-7" />
       </div>
       <div className="pointer-events-none relative z-10 mt-4 min-w-0">
         <div className="flex items-center gap-2 text-lg font-bold">
