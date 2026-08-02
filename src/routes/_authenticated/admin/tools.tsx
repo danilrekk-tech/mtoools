@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, Pencil } from "lucide-react";
-import { DynIcon } from "@/components/mtools/icon";
+import { ToolIcon } from "@/components/mtools/icon";
+import { IconPicker } from "@/components/mtools/icon-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -25,7 +26,7 @@ function AdminTools() {
   const { data: tools } = useSuspenseQuery(toolsQuery());
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const empty = { name: "", slug: "", description: "", icon: "wrench", color: "#1E4FD9", category: "general", kind: "internal", url: "", is_active: true };
+  const empty = { name: "", slug: "", description: "", icon: "Wrench", icon_mode: "icon", color: "#1E4FD9", category: "general", kind: "internal", url: "", is_active: true };
   const [form, setForm] = useState<any>(empty);
 
   const openNew = () => { setEditing(null); setForm(empty); setOpen(true); };
@@ -61,10 +62,14 @@ function AdminTools() {
               <div><Label>Название</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
               <div><Label>Slug (латиница, тире)</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} /></div>
               <div><Label>Описание</Label><Textarea value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-              <div className="grid grid-cols-2 gap-2">
-                <div><Label>Иконка (lucide)</Label><Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} /></div>
-                <div><Label>Категория</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} /></div>
-              </div>
+              <div><Label>Категория</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} /></div>
+              <IconPicker
+                icon={form.icon}
+                iconMode={form.icon_mode}
+                color={form.color}
+                url={form.url}
+                onChange={(patch) => setForm({ ...form, ...patch })}
+              />
               <div className="grid grid-cols-2 gap-2">
                 <div><Label>Цвет</Label><Input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="h-10 w-full" /></div>
                 <div><Label>Тип</Label>
@@ -89,7 +94,7 @@ function AdminTools() {
           <Card key={t.id}>
             <CardHeader className="flex flex-row items-start gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: (t.color ?? "#1E4FD9") + "22", color: t.color }}>
-                <DynIcon name={t.icon} className="h-5 w-5" />
+                <ToolIcon icon={t.icon} iconMode={t.icon_mode} url={t.url} className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
                 <CardTitle className="text-base">{t.name}</CardTitle>
