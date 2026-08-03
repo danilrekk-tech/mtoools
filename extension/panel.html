@@ -19,6 +19,7 @@
   <button data-t="text">Текст</button>
   <button data-t="color">Цвет</button>
   <button data-t="date">Даты</button>
+  <button data-t="util">Утилиты</button>
   <button data-t="links">Сервисы</button>
 </nav>
 <main>
@@ -90,6 +91,20 @@
     <div class="muted" id="tsOut">&nbsp;</div>
   </section>
 
+
+  <section id="util" class="card hidden">
+    <div class="muted">UUID v4</div>
+    <div class="row"><input id="uuidOut" readonly /><button class="btn primary" id="uuidGen">↻</button></div>
+    <div class="muted" style="margin-top:10px">SHA-256</div>
+    <div class="row"><input id="hashIn" placeholder="Строка" /><button class="btn" id="hashGo">→</button></div>
+    <div class="muted" id="hashOut" style="word-break:break-all">&nbsp;</div>
+    <div class="muted" style="margin-top:10px">Проценты</div>
+    <div class="row"><input id="pctA" type="number" placeholder="Сколько" /><input id="pctB" type="number" placeholder="% от" /><button class="btn" id="pctGo">=</button></div>
+    <div class="res" id="pctOut">—</div>
+    <div class="muted" style="margin-top:10px">Случайное число</div>
+    <div class="row"><input id="rndA" type="number" value="1" /><input id="rndB" type="number" value="100" /><button class="btn" id="rndGo">🎲</button></div>
+    <div class="res" id="rndOut">—</div>
+  </section>
   <section id="links" class="card hidden">
     <div class="row"><input id="syncToken" placeholder="Ключ синхронизации из /extension" /><button class="btn primary" id="syncGo">⟳</button></div>
     <div class="muted" id="syncState">Вставьте ключ, чтобы подтянуть свои инструменты и сервисы.</div>

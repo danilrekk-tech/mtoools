@@ -7,7 +7,7 @@ tabs.forEach((b) =>
   b.addEventListener("click", () => {
     tabs.forEach((x) => x.classList.remove("active"));
     b.classList.add("active");
-    ["calc", "pass", "conv", "notes", "pomo", "text", "color", "date", "links"].forEach((id) =>
+    ["calc", "pass", "conv", "notes", "pomo", "text", "color", "date", "util", "links"].forEach((id) =>
       document.getElementById(id).classList.toggle("hidden", id !== b.dataset.t),
     );
   }),
@@ -331,4 +331,32 @@ document.getElementById("lAdd").addEventListener("click", () => {
   document.getElementById("lName").value = "";
   document.getElementById("lUrl").value = "";
   saveLinks();
+});
+
+
+// ---- утилиты ----
+const genUuid = () => (crypto.randomUUID ? crypto.randomUUID() : "");
+document.getElementById("uuidGen").addEventListener("click", () => {
+  const v = genUuid();
+  document.getElementById("uuidOut").value = v;
+  if (v) navigator.clipboard.writeText(v).catch(() => {});
+});
+document.getElementById("hashGo").addEventListener("click", async () => {
+  const val = document.getElementById("hashIn").value;
+  if (!val) return;
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(val));
+  document.getElementById("hashOut").textContent = [...new Uint8Array(buf)]
+    .map((b) => b.toString(16).padStart(2, "0")).join("");
+});
+document.getElementById("pctGo").addEventListener("click", () => {
+  const a = parseFloat(document.getElementById("pctA").value);
+  const b = parseFloat(document.getElementById("pctB").value);
+  document.getElementById("pctOut").textContent =
+    isFinite(a) && isFinite(b) && b !== 0 ? ((a / b) * 100).toFixed(2) + " %" : "—";
+});
+document.getElementById("rndGo").addEventListener("click", () => {
+  const a = Math.ceil(+document.getElementById("rndA").value || 0);
+  const b = Math.floor(+document.getElementById("rndB").value || 0);
+  const [lo, hi] = a <= b ? [a, b] : [b, a];
+  document.getElementById("rndOut").textContent = String(lo + Math.floor(Math.random() * (hi - lo + 1)));
 });
