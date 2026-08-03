@@ -269,37 +269,55 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assignee_id: string | null
+          checklist: Json
+          completed_at: string | null
           created_at: string
+          created_by: string | null
           description: string | null
           due_at: string | null
+          estimate_minutes: number | null
           id: string
           priority: string
           project: string | null
           status: string
+          tags: string[]
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          assignee_id?: string | null
+          checklist?: Json
+          completed_at?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           due_at?: string | null
+          estimate_minutes?: number | null
           id?: string
           priority?: string
           project?: string | null
           status?: string
+          tags?: string[]
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          assignee_id?: string | null
+          checklist?: Json
+          completed_at?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           due_at?: string | null
+          estimate_minutes?: number | null
           id?: string
           priority?: string
           project?: string | null
           status?: string
+          tags?: string[]
           title?: string
           updated_at?: string
           user_id?: string
@@ -380,8 +398,10 @@ export type Database = {
           duration_seconds: number | null
           ended_at: string | null
           id: string
+          is_manual: boolean
           note: string | null
           started_at: string
+          task_id: string | null
           user_id: string
         }
         Insert: {
@@ -389,8 +409,10 @@ export type Database = {
           duration_seconds?: number | null
           ended_at?: string | null
           id?: string
+          is_manual?: boolean
           note?: string | null
           started_at?: string
+          task_id?: string | null
           user_id: string
         }
         Update: {
@@ -398,11 +420,21 @@ export type Database = {
           duration_seconds?: number | null
           ended_at?: string | null
           id?: string
+          is_manual?: boolean
           note?: string | null
           started_at?: string
+          task_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tools: {
         Row: {
