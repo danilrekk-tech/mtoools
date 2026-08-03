@@ -78,7 +78,13 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
             "<b>Команды:</b>",
             "/link CODE — привязать аккаунт (код из личного кабинета)",
             "/tasks — мои открытые задачи",
+            "/new ТЕКСТ — создать задачу",
+            "/done N — закрыть задачу №N из /tasks",
             "/shift — ближайшая смена",
+            "/time — запустить или остановить таймер",
+            "/report — время за сегодня и неделю",
+            "/tools — мои инструменты и сервисы",
+            "/me — мой профиль",
             "/team — задачи отдела (для менеджеров)",
           ].join("\n");
           await sendMessage(chatId, base);
@@ -121,10 +127,89 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
             .eq("user_id", linked.id).neq("status", "done")
             .order("due_at", { ascending: true, nullsFirst: false }).limit(10);
           if (!tasks?.length) { await sendMessage(chatId, "🎉 Открытых задач нет."); return Response.json({ ok: true }); }
-          const body = tasks.map((t: any) =>
-            `• ${t.title}${t.due_at ? ` <i>(до ${new Date(t.due_at).toLocaleDateString("ru-RU")})</i>` : ""}`,
+          const body = tasks.map((t: any, i: number) =>
+            `${i + 1}. ${t.title}${t.due_at ? ` <i>(до ${new Date(t.due_at).toLocaleDateString("ru-RU")})</i>` : ""}`,
           ).join("\n");
-          await sendMessage(chatId, `<b>Ваши задачи:</b>\n${body}`);
+          await sendMessage(chatId, `<b>Ваши задачи:</b>\n${body}\n\nЗакрыть: <code>/done 1</code>`);
+          return Response.json({ ok: true });
+        }
+
+        // /new — создать задачу
+        if (cmd === "/new") {
+          if (!arg.trim()) { await sendMessage(chatId, "Использование: <code>/new Позвонить клиенту</code>"); return Response.json({ ok: true }); }
+          const { error } = await supabase.from("tasks").insert({
+            user_id: linked.id, assignee_id: linked.id, created_by: linked.id, title: arg.trim(), status: "todo", priority: "medium",
+          });
+          await sendMessage(chatId, error ? `❌ ${error.message}` : `✅ Задача создана: ${arg.trim()}`);
+          return Response.json({ ok: true });
+        }
+
+        // /done N — закрыть задачу
+        if (cmd === "/done") {
+          const n = Number(arg.trim());
+          const { data: list } = await supabase
+            .from("tasks").select("id, title").eq("user_id", linked.id).neq("status", "done")
+            .order("due_at", { ascending: true, nullsFirst: false }).limit(10);
+          const target = list?.[n - 1];
+          if (!n || !target) { await sendMessage(chatId, "Укажите номер задачи из /tasks, например <code>/done 2</code>"); return Response.json({ ok: true }); }
+          await supabase.from("tasks").update({ status: "done", completed_at: new Date().toISOString() }).eq("id", target.id);
+          await sendMessage(chatId, `✅ Закрыто: ${target.title}`);
+          return Response.json({ ok: true });
+        }
+
+        // /time — таймер
+        if (cmd === "/time") {
+          const { data: active } = await supabase
+            .from("time_entries").select("id, started_at, note").eq("user_id", linked.id).is("ended_at", null).maybeSingle();
+          if (active) {
+            const dur = Math.floor((Date.now() - new Date(active.started_at).getTime()) / 1000);
+            await supabase.from("time_entries").update({ ended_at: new Date().toISOString(), duration_seconds: dur }).eq("id", active.id);
+            await sendMessage(chatId, `⏹ Таймер остановлен: ${(dur / 3600).toFixed(2)} ч`);
+          } else {
+            await supabase.from("time_entries").insert({ user_id: linked.id, note: arg.trim() || "Работа из Telegram" });
+            await sendMessage(chatId, "▶️ Таймер запущен. Отправьте /time снова, чтобы остановить.");
+          }
+          return Response.json({ ok: true });
+        }
+
+        // /report — время
+        if (cmd === "/report") {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const weekStart = new Date(today); weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+          const { data: entries } = await supabase
+            .from("time_entries").select("started_at, duration_seconds").eq("user_id", linked.id).gte("started_at", weekStart.toISOString());
+          let d = 0, w = 0;
+          for (const e of entries ?? []) {
+            const dur = (e as any).duration_seconds ?? 0;
+            w += dur;
+            if (new Date((e as any).started_at) >= today) d += dur;
+          }
+          await sendMessage(chatId, `<b>Учёт времени</b>\nСегодня: ${(d / 3600).toFixed(1)} ч\nЗа неделю: ${(w / 3600).toFixed(1)} ч`);
+          return Response.json({ ok: true });
+        }
+
+        // /tools — инструменты сотрудника
+        if (cmd === "/tools") {
+          const { data: allowed } = await supabase
+            .from("department_tools").select("tool:tools(name, url, kind, is_active)")
+            .eq("department_id", linked.department_id ?? "00000000-0000-0000-0000-000000000000");
+          const items = (allowed ?? []).map((r: any) => r.tool).filter((t: any) => t?.is_active);
+          if (!items.length) { await sendMessage(chatId, "Инструменты не назначены."); return Response.json({ ok: true }); }
+          const body = items.map((t: any) => (t.url ? `• <a href="${t.url}">${t.name}</a>` : `• ${t.name}`)).join("\n");
+          await sendMessage(chatId, `<b>Ваши инструменты:</b>\n${body}`);
+          return Response.json({ ok: true });
+        }
+
+        // /me — профиль
+        if (cmd === "/me") {
+          const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", linked.id);
+          const roleList = (roles ?? []).map((r: any) => r.role).join(", ") || "employee";
+          const { count } = await supabase
+            .from("tasks").select("id", { count: "exact", head: true }).eq("user_id", linked.id).neq("status", "done");
+          await sendMessage(
+            chatId,
+            `<b>${linked.full_name ?? "Сотрудник"}</b>\nОтдел: ${(linked.department as any)?.name ?? "—"}\nРоли: ${roleList}\nОткрытых задач: ${count ?? 0}`,
+          );
           return Response.json({ ok: true });
         }
 
