@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { shiftsQuery, profileQuery } from "@/lib/queries";
+import { shiftsQuery, profileQuery, tasksQuery } from "@/lib/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as UICalendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, ListTodo } from "lucide-react";
 import { ru } from "date-fns/locale";
 import { useMemo, useState } from "react";
 
@@ -25,6 +25,7 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 function CalendarPage() {
   const { data: me } = useSuspenseQuery(profileQuery());
   const { data: allShifts } = useSuspenseQuery(shiftsQuery());
+  const { data: tasks } = useSuspenseQuery(tasksQuery());
   const [date, setDate] = useState<Date>(() => startOfDay(new Date()));
   const [month, setMonth] = useState<Date>(() => startOfDay(new Date()));
 
@@ -71,6 +72,26 @@ function CalendarPage() {
     [shiftsByDay],
   );
 
+  const tasksByDay = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const t of tasks as any[]) {
+      if (!t.due_at) continue;
+      const k = dayKey(new Date(t.due_at));
+      map.set(k, [...(map.get(k) ?? []), t]);
+    }
+    return map;
+  }, [tasks]);
+
+  const dueDays = useMemo(
+    () => [...tasksByDay.keys()].map((k) => {
+      const [y, m, d] = k.split("-").map(Number);
+      return new Date(y, m, d);
+    }),
+    [tasksByDay],
+  );
+
+  const dayTasks = tasksByDay.get(dayKey(date)) ?? [];
+
   const shiftMonth = (delta: number) => {
     const next = new Date(month.getFullYear(), month.getMonth() + delta, 1);
     setMonth(next);
@@ -116,10 +137,11 @@ function CalendarPage() {
               onMonthChange={setMonth}
               selected={date}
               onSelect={(d) => d && setDate(startOfDay(d))}
-              modifiers={{ hasShift: shiftDays }}
+              modifiers={{ hasShift: shiftDays, hasTask: dueDays }}
               modifiersClassNames={{
                 hasShift:
                   "relative font-bold text-primary after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary",
+                hasTask: "underline decoration-2 underline-offset-4 decoration-emerald-500",
               }}
               className="rounded-md border"
             />
@@ -147,6 +169,21 @@ function CalendarPage() {
                   </div>
                 </div>
               ))}
+              {dayTasks.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <ListTodo className="h-3.5 w-3.5" /> Дедлайны
+                  </div>
+                  {dayTasks.map((t: any) => (
+                    <div key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border px-3 py-2 text-sm">
+                      <span className={`truncate ${t.status === "done" ? "text-muted-foreground line-through" : ""}`}>{t.title}</span>
+                      <Badge variant={t.status === "done" ? "secondary" : "outline"} className="shrink-0">
+                        {new Date(t.due_at).toLocaleTimeString("ru-RU", { timeStyle: "short" })}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -62,7 +62,7 @@ function ExtensionPage() {
         <CardContent className="grid gap-4 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="gradient-brand text-white">v1.2.0</Badge>
+              <Badge className="gradient-brand text-white">v1.3.0</Badge>
               <Badge variant="outline">Manifest V3</Badge>
               <Badge variant="outline">Chrome · Edge · Brave · Arc</Badge>
             </div>

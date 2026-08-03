@@ -153,3 +153,29 @@ export const auditLogQuery = () =>
       return data ?? [];
     },
   });
+export const timeEntriesQuery = () =>
+  queryOptions({
+    queryKey: ["me", "time-entries"],
+    queryFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return [];
+      const { data } = await supabase
+        .from("time_entries")
+        .select("*")
+        .eq("user_id", uid)
+        .not("ended_at", "is", null)
+        .order("started_at", { ascending: false })
+        .limit(100);
+      return data ?? [];
+    },
+  });
+
+export const teamProfilesQuery = () =>
+  queryOptions({
+    queryKey: ["team", "profiles"],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("id, full_name, email, department_id").eq("is_active", true).order("full_name");
+      return data ?? [];
+    },
+  });
