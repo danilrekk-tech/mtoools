@@ -179,3 +179,12 @@ export const teamProfilesQuery = () =>
       return data ?? [];
     },
   });
+
+export const toolCategoriesQuery = () =>
+  queryOptions({
+    queryKey: ["tool-categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("tool_categories").select("*").order("name");
+      return data ?? [];
+    },
+  });

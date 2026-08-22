@@ -1,6 +1,8 @@
 import { ToolIcon } from "@/components/mtools/icon";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { AlertTriangle, ChevronDown, ExternalLink, LifeBuoy, Star, Unlink } from "lucide-react";
+import { useRef, useState } from "react";
+import { statusMeta } from "@/lib/tool-meta";
 import type { AnyTool } from "@/components/mtools/tool-launcher";
 
 export type ToolLike = AnyTool & {
@@ -8,60 +10,144 @@ export type ToolLike = AnyTool & {
   icon_mode?: string | null;
   color?: string | null;
   category?: string | null;
+  tags?: string[] | null;
+  features?: string[] | null;
+  status?: string | null;
+  is_active?: boolean | null;
+  last_checked_at?: string | null;
 };
 
-/** Big gradient tool tile — the whole card is a button in normal mode. */
 export function ToolCard({
   tool,
   onOpen,
   footer,
+  favorite,
+  onToggleFavorite,
 }: {
   tool: ToolLike;
   onOpen: () => void;
   footer?: React.ReactNode;
+  favorite?: boolean;
+  onToggleFavorite?: () => void;
 }) {
   const color = tool.color ?? "#1E4FD9";
+  const st = statusMeta(tool);
+  const unavailable = st.key === "unavailable" || st.key === "disabled";
+  const [open, setOpen] = useState(false);
+  const panel = useRef<HTMLDivElement>(null);
+  const features = (tool.features ?? []).filter(Boolean);
+  const tags = (tool.tags ?? []).filter(Boolean).slice(0, 2);
+  const access = tool.kind === "external" ? "внешний" : "внутренний";
+
   return (
     <div
-      className="group relative flex flex-col overflow-hidden rounded-2xl border p-5 transition hover:-translate-y-0.5 hover:shadow-lg"
-      style={{
-        backgroundImage: `linear-gradient(135deg, ${color}2e, ${color}08 55%, transparent)`,
-        borderColor: `${color}33`,
-      }}
+      className={`group flex flex-col overflow-hidden rounded-2xl border bg-card transition ${
+        unavailable ? "opacity-70" : "hover:-translate-y-[3px] hover:shadow-lg"
+      }`}
+      style={{ borderColor: `${color}33` }}
     >
-      <button
-        type="button"
-        onClick={onOpen}
-        aria-label={`Открыть ${tool.name}`}
-        className="absolute inset-0 z-0 cursor-pointer rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-      <div
-        className="pointer-events-none relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-sm"
-        style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}bb)` }}
-      >
-        <ToolIcon icon={tool.icon} iconMode={tool.icon_mode} url={tool.url} className="h-7 w-7" />
-      </div>
-      <div className="pointer-events-none relative z-10 mt-4 min-w-0">
-        <div className="flex items-center gap-2 text-lg font-bold">
-          <span className="truncate">{tool.name}</span>
-          {tool.kind === "external" && <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+      <div className="p-5 pb-4" style={{ backgroundImage: `linear-gradient(135deg, ${color}22, ${color}0a)` }}>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex min-w-0 items-start gap-3">
+            <span
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background shadow-sm transition ${
+                unavailable ? "text-muted-foreground" : "group-hover:scale-105 group-hover:-rotate-2"
+              }`}
+              style={unavailable ? undefined : { color }}
+            >
+              {st.key === "unavailable" ? (
+                <Unlink className="h-5 w-5" />
+              ) : (
+                <ToolIcon icon={tool.icon} iconMode={tool.icon_mode} url={tool.url} className="h-5 w-5" />
+              )}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate font-semibold">{tool.name}</p>
+              <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span className={`h-1.5 w-1.5 animate-pulse rounded-full ${st.dot}`} />
+                {st.label} · {access}
+              </p>
+            </div>
+          </div>
+          {onToggleFavorite && (
+            <button
+              type="button"
+              onClick={onToggleFavorite}
+              aria-label={favorite ? "Убрать из «Мои инструменты»" : "В «Мои инструменты»"}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-background/60 hover:text-foreground"
+            >
+              <Star className={`h-4 w-4 ${favorite ? "fill-amber-400 text-amber-400" : ""}`} />
+            </button>
+          )}
         </div>
-        <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">
+      </div>
+
+      <div className="flex flex-1 flex-col px-5 pb-5">
+        <div className="mb-2.5 mt-3 flex flex-wrap gap-1.5">
+          {tool.category && (
+            <span className="rounded-md bg-primary/10 px-2.5 py-0.5 text-xs text-primary">{tool.category}</span>
+          )}
+          {tags.map((t) => (
+            <span key={t} className="rounded-md bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{t}</span>
+          ))}
+        </div>
+
+        <p className="line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
           {tool.description || "Откройте инструмент в один клик"}
         </p>
+
+        {st.key === "unavailable" && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              Сервис не отвечает
+              {tool.last_checked_at && (
+                <span className="block text-destructive/80">
+                  Последняя проверка: {new Date(tool.last_checked_at).toLocaleString("ru-RU")}
+                </span>
+              )}
+            </span>
+          </div>
+        )}
+
+        {features.length > 0 && (
+          <>
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="mt-3 flex w-full items-center justify-center gap-1.5 text-[13px] text-muted-foreground transition hover:text-foreground"
+            >
+              Возможности <ChevronDown className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} />
+            </button>
+            <div
+              ref={panel}
+              className="overflow-hidden transition-[max-height] duration-200"
+              style={{ maxHeight: open ? (panel.current?.scrollHeight ?? 400) : 0 }}
+            >
+              <ul className="my-2 list-disc pl-5 text-[13px] leading-7 text-muted-foreground">
+                {features.map((f, i) => <li key={i}>{f}</li>)}
+              </ul>
+            </div>
+          </>
+        )}
+
+        <div className="mt-auto pt-4">
+          {unavailable ? (
+            <div className="space-y-2">
+              <Button className="w-full" disabled>Недоступно</Button>
+              <Button variant="outline" size="sm" className="w-full" asChild>
+                <a href="/telegram"><LifeBuoy className="mr-2 h-3.5 w-3.5" />Сообщить в поддержку</a>
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={onOpen} className="w-full gradient-brand text-white">
+              Открыть {tool.kind === "external" && <ExternalLink className="ml-2 h-3.5 w-3.5" />}
+            </Button>
+          )}
+        </div>
+
+        {footer && <div className="mt-4 border-t pt-3">{footer}</div>}
       </div>
-      <div className="relative z-10 mt-4 flex items-end justify-between gap-2">
-        <Button size="sm" variant="secondary" onClick={onOpen} className="relative z-20">
-          Открыть
-        </Button>
-        <span
-          className="pointer-events-none flex h-9 w-9 items-center justify-center rounded-full border transition group-hover:translate-x-0.5"
-          style={{ borderColor: `${color}55`, color }}
-        >
-          <ArrowRight className="h-4 w-4" />
-        </span>
-      </div>
-      {footer && <div className="relative z-20 mt-4 border-t pt-3">{footer}</div>}
     </div>
   );
 }
