@@ -436,19 +436,44 @@ export type Database = {
           },
         ]
       }
+      tool_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       tools: {
         Row: {
           category: string | null
           color: string | null
           created_at: string
           description: string | null
+          features: string[]
           icon: string | null
           icon_mode: string
           id: string
           is_active: boolean
           kind: string
+          last_checked_at: string | null
           name: string
           slug: string
+          status: string
+          tags: string[]
           updated_at: string
           url: string | null
         }
@@ -457,13 +482,17 @@ export type Database = {
           color?: string | null
           created_at?: string
           description?: string | null
+          features?: string[]
           icon?: string | null
           icon_mode?: string
           id?: string
           is_active?: boolean
           kind?: string
+          last_checked_at?: string | null
           name: string
           slug: string
+          status?: string
+          tags?: string[]
           updated_at?: string
           url?: string | null
         }
@@ -472,13 +501,17 @@ export type Database = {
           color?: string | null
           created_at?: string
           description?: string | null
+          features?: string[]
           icon?: string | null
           icon_mode?: string
           id?: string
           is_active?: boolean
           kind?: string
+          last_checked_at?: string | null
           name?: string
           slug?: string
+          status?: string
+          tags?: string[]
           updated_at?: string
           url?: string | null
         }
