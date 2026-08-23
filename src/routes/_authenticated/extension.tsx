@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Download, Chrome, PanelRight, RefreshCw, Copy } from "lucide-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { Download, Chrome, PanelRight, RefreshCw, Copy, Eye, EyeOff, RotateCcw } from "lucide-react";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { profileQuery } from "@/lib/queries";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/extension")({
@@ -31,8 +33,22 @@ const steps = [
 ];
 
 function ExtensionPage() {
+  const qc = useQueryClient();
   const { data: me } = useSuspenseQuery(profileQuery());
   const token = (me?.profile as { extension_token?: string } | null)?.extension_token ?? "";
+  const [revealed, setReveal] = useState(false);
+  const masked = token ? `${token.slice(0, 4)}${"•".repeat(Math.max(token.length - 8, 8))}${token.slice(-4)}` : "";
+
+  const resetToken = async () => {
+    if (!confirm("Сбросить ключ? Все устройства придётся подключить заново.")) return;
+    const next = crypto.randomUUID().replace(/-/g, "");
+    const { error } = await supabase.from("profiles").update({ extension_token: next }).eq("id", me!.user.id);
+    if (error) return toast.error(error.message);
+    toast.success("Ключ обновлён");
+    setReveal(true);
+    qc.invalidateQueries({ queryKey: ["me", "profile"] });
+  };
+
   const download = () => {
     fetch("/mtools-extension.zip")
       .then((r) => {
@@ -89,16 +105,24 @@ function ExtensionPage() {
             заметки и выбранный режим на любом устройстве.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Input readOnly value={token} className="font-mono text-xs" />
-            <Button
-              variant="secondary"
-              onClick={() => {
-                navigator.clipboard.writeText(token);
-                toast.success("Ключ скопирован");
-              }}
-            >
-              <Copy className="mr-2 h-4 w-4" /> Копировать
-            </Button>
+            <Input readOnly value={revealed ? token : masked} className="font-mono text-xs" />
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon" title={revealed ? "Скрыть" : "Показать"} onClick={() => setReveal((v) => !v)}>
+                {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(token);
+                  toast.success("Ключ скопирован");
+                }}
+              >
+                <Copy className="mr-2 h-4 w-4" /> Копировать
+              </Button>
+              <Button variant="outline" onClick={resetToken}>
+                <RotateCcw className="mr-2 h-4 w-4" /> Сбросить
+              </Button>
+            </div>
           </div>
           <p className="text-xs">Не передавайте ключ третьим лицам — он открывает доступ к вашему списку инструментов.</p>
         </CardContent>
