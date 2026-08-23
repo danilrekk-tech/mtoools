@@ -34,6 +34,16 @@ function SettingsPage() {
     qc.invalidateQueries({ queryKey: ["me", "profile"] });
   };
 
+  const changePassword = async () => {
+    if (pw1.length < 8) return toast.error("Минимум 8 символов");
+    if (pw1 !== pw2) return toast.error("Пароли не совпадают");
+    const { error } = await supabase.auth.updateUser({ password: pw1 });
+    if (error) return toast.error(error.message);
+    setPw1("");
+    setPw2("");
+    toast.success("Пароль обновлён");
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold">Мой профиль</h1>
@@ -46,6 +56,36 @@ function SettingsPage() {
           <div><Label>Часовой пояс</Label><Input value={tz ?? ""} onChange={(e) => setTz(e.target.value)} /></div>
           <div><Label>Отдел</Label><Input value={(me?.profile?.department as any)?.name ?? "Не назначен"} disabled /></div>
           <Button onClick={save} className="gradient-brand text-white">Сохранить</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><ShieldCheck className="h-4 w-4" />Безопасность</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div><Label>Новый пароль</Label><Input type="password" value={pw1} onChange={(e) => setPw1(e.target.value)} autoComplete="new-password" /></div>
+            <div><Label>Повторите пароль</Label><Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} autoComplete="new-password" /></div>
+          </div>
+          <Button variant="secondary" onClick={changePassword}>Сменить пароль</Button>
+
+          <div className="flex items-start justify-between gap-4 rounded-lg border p-3">
+            <div>
+              <div className="text-sm font-medium">Подтверждение входа по e-mail</div>
+              <p className="text-xs text-muted-foreground">
+                Дополнительный код на почту при входе с нового устройства.
+              </p>
+            </div>
+            <Switch
+              checked={twofa}
+              onCheckedChange={async (v) => {
+                setTwofa(v);
+                const prefs = { ...(((me?.profile as any)?.ui_prefs as Record<string, unknown>) ?? {}), two_factor_email: v };
+                await supabase.from("profiles").update({ ui_prefs: prefs }).eq("id", me!.user.id);
+                qc.invalidateQueries({ queryKey: ["me", "profile"] });
+                toast.success(v ? "Подтверждение включено" : "Подтверждение выключено");
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
