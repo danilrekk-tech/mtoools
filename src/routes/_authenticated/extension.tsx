@@ -105,16 +105,24 @@ function ExtensionPage() {
             заметки и выбранный режим на любом устройстве.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Input readOnly value={token} className="font-mono text-xs" />
-            <Button
-              variant="secondary"
-              onClick={() => {
-                navigator.clipboard.writeText(token);
-                toast.success("Ключ скопирован");
-              }}
-            >
-              <Copy className="mr-2 h-4 w-4" /> Копировать
-            </Button>
+            <Input readOnly value={revealed ? token : masked} className="font-mono text-xs" />
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon" title={revealed ? "Скрыть" : "Показать"} onClick={() => setReveal((v) => !v)}>
+                {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(token);
+                  toast.success("Ключ скопирован");
+                }}
+              >
+                <Copy className="mr-2 h-4 w-4" /> Копировать
+              </Button>
+              <Button variant="outline" onClick={resetToken}>
+                <RotateCcw className="mr-2 h-4 w-4" /> Сбросить
+              </Button>
+            </div>
           </div>
           <p className="text-xs">Не передавайте ключ третьим лицам — он открывает доступ к вашему списку инструментов.</p>
         </CardContent>
