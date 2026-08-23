@@ -31,8 +31,22 @@ const steps = [
 ];
 
 function ExtensionPage() {
+  const qc = useQueryClient();
   const { data: me } = useSuspenseQuery(profileQuery());
   const token = (me?.profile as { extension_token?: string } | null)?.extension_token ?? "";
+  const [revealed, setReveal] = useState(false);
+  const masked = token ? `${token.slice(0, 4)}${"•".repeat(Math.max(token.length - 8, 8))}${token.slice(-4)}` : "";
+
+  const resetToken = async () => {
+    if (!confirm("Сбросить ключ? Все устройства придётся подключить заново.")) return;
+    const next = crypto.randomUUID().replace(/-/g, "");
+    const { error } = await supabase.from("profiles").update({ extension_token: next }).eq("id", me!.user.id);
+    if (error) return toast.error(error.message);
+    toast.success("Ключ обновлён");
+    setReveal(true);
+    qc.invalidateQueries({ queryKey: ["me", "profile"] });
+  };
+
   const download = () => {
     fetch("/mtools-extension.zip")
       .then((r) => {
