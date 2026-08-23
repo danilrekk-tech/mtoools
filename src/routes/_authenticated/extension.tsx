@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Download, Chrome, PanelRight, RefreshCw, Copy } from "lucide-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { Download, Chrome, PanelRight, RefreshCw, Copy, Eye, EyeOff, RotateCcw } from "lucide-react";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { profileQuery } from "@/lib/queries";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/extension")({
