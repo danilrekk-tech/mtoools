@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
-import { profileQuery, departmentsQuery } from "@/lib/queries";
+import { profileQuery } from "@/lib/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -20,11 +22,17 @@ function SettingsPage() {
   const [name, setName] = useState(me?.profile?.full_name ?? "");
   const [pos, setPos] = useState(me?.profile?.position ?? "");
   const [tz, setTz] = useState(me?.profile?.timezone ?? "Europe/Moscow");
+  const [pw1, setPw1] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [twofa, setTwofa] = useState(
+    Boolean(((me?.profile as any)?.ui_prefs as Record<string, unknown> | undefined)?.two_factor_email),
+  );
 
   useEffect(() => {
     setName(me?.profile?.full_name ?? "");
     setPos(me?.profile?.position ?? "");
     setTz(me?.profile?.timezone ?? "Europe/Moscow");
+    setTwofa(Boolean(((me?.profile as any)?.ui_prefs as Record<string, unknown> | undefined)?.two_factor_email));
   }, [me]);
 
   const save = async () => {
