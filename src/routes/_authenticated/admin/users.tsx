@@ -36,6 +36,7 @@ function AdminUsers() {
   const [q, setQ] = useState("");
   const [fDept, setFDept] = useState("all");
   const [fRole, setFRole] = useState("all");
+  const [view, setView] = useState<"cards" | "table">("cards");
 
   const setDepartment = async (userId: string, deptId: string) => {
     const { error } = await supabase.from("profiles").update({ department_id: deptId === "none" ? null : deptId }).eq("id", userId);
