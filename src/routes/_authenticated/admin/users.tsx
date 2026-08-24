@@ -12,10 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Send, Search, Download } from "lucide-react";
+import { Send, Search, Download, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { sendTelegramToUser } from "@/lib/telegram.functions";
+import { UserAvatar, DeptDot } from "@/components/mtools/user-avatar";
+
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   head: () => ({ meta: [{ title: "Пользователи · Админ · MTools" }, { name: "description", content: "Управление сотрудниками и ролями." }] }),
