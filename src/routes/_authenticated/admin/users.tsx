@@ -107,7 +107,6 @@ function AdminUsers() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <h1 className="text-xl font-bold sm:text-2xl">Пользователи</h1>
         <div className="flex items-center gap-2">
           <div className="flex rounded-md border p-0.5">
