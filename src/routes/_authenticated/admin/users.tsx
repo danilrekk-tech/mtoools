@@ -156,24 +156,83 @@ function AdminUsers() {
         </Select>
       </div>
 
+      {view === "table" ? (
+        <Card>
+          <CardHeader><CardTitle>Сотрудники ({filtered.length})</CardTitle></CardHeader>
+          <CardContent className="overflow-x-auto p-0">
+            <table className="w-full min-w-[760px] text-sm">
+              <thead className="border-b text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="p-3">Сотрудник</th>
+                  <th className="p-3">Отдел</th>
+                  <th className="p-3">Роли</th>
+                  <th className="p-3">Telegram</th>
+                  <th className="p-3">Доступ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((u: any) => {
+                  const dept = (departments ?? []).find((d: any) => d.id === u.department_id);
+                  return (
+                    <tr key={u.id} className="border-b last:border-0">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <UserAvatar name={u.full_name} email={u.email} avatarUrl={u.avatar_url} className="h-8 w-8" />
+                          <div className="min-w-0">
+                            <div className="truncate font-medium">{u.full_name ?? "Без имени"}</div>
+                            <div className="truncate text-xs text-muted-foreground">{u.email}{u.position ? ` · ${u.position}` : ""}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <span className="inline-flex items-center gap-1.5 text-xs">
+                          <DeptDot color={dept?.color} />{dept?.name ?? "—"}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-1">
+                          {u.roles.length === 0 && <span className="text-xs text-muted-foreground">—</span>}
+                          {u.roles.map((r: string) => <Badge key={r} variant="outline" className="text-[10px]">{r}</Badge>)}
+                        </div>
+                      </td>
+                      <td className="p-3 text-xs">{u.telegram_chat_id ? `@${u.telegram_username ?? "linked"}` : "—"}</td>
+                      <td className="p-3"><Switch checked={u.is_active !== false} onCheckedChange={(v) => toggleActive(u.id, v)} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      ) : (
       <Card>
         <CardHeader><CardTitle>Сотрудники ({filtered.length})</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {filtered.length === 0 && <div className="text-sm text-muted-foreground">Никого не найдено</div>}
-          {filtered.map((u: any) => (
+          {filtered.map((u: any) => {
+            const dept = (departments ?? []).find((d: any) => d.id === u.department_id);
+            return (
             <div key={u.id} className="grid gap-3 rounded-lg border p-4 md:grid-cols-[1.5fr_1fr_1.5fr_auto]">
-              <div className="min-w-0">
+              <div className="flex min-w-0 gap-3">
+                <UserAvatar name={u.full_name} email={u.email} avatarUrl={u.avatar_url} />
+                <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium">{u.full_name ?? "Без имени"}</span>
                   {u.is_active === false && <Badge variant="destructive">отключён</Badge>}
                 </div>
                 <div className="truncate text-xs text-muted-foreground">{u.email}</div>
                 {u.position && <div className="text-xs text-muted-foreground">{u.position}</div>}
+                {dept && (
+                  <div className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <DeptDot color={dept.color} />{dept.name}
+                  </div>
+                )}
                 {u.telegram_chat_id && <div className="mt-1 text-xs text-primary">TG: @{u.telegram_username ?? "linked"}</div>}
                 <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                   <Switch checked={u.is_active !== false} onCheckedChange={(v) => toggleActive(u.id, v)} />
                   Доступ активен
                 </label>
+                </div>
               </div>
               <Select value={u.department_id ?? "none"} onValueChange={(v) => setDepartment(u.id, v)}>
                 <SelectTrigger><SelectValue placeholder="Отдел" /></SelectTrigger>
@@ -202,8 +261,10 @@ function AdminUsers() {
                 <Send className="mr-2 h-4 w-4" />TG
               </Button>
             </div>
-          ))}
+            );
+          })}
         </CardContent>
+
       </Card>
 
       <Dialog open={!!dm} onOpenChange={(v) => !v && setDm(null)}>
