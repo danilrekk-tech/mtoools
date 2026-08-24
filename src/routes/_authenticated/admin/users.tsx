@@ -107,9 +107,17 @@ function AdminUsers() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <h1 className="text-xl font-bold sm:text-2xl">Пользователи</h1>
-        <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />CSV</Button>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-md border p-0.5">
+            <Button variant={view === "cards" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setView("cards")}><LayoutGrid className="h-4 w-4" /></Button>
+            <Button variant={view === "table" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setView("table")}><TableIcon className="h-4 w-4" /></Button>
+          </div>
+          <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />CSV</Button>
+        </div>
       </div>
+
 
       <div className="grid gap-4 sm:grid-cols-3">
         {[
