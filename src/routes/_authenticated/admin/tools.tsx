@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, Pencil, Search, LayoutGrid, Table as TableIcon, X } from "lucide-react";
+import { Plus, Trash2, Pencil, Search, X } from "lucide-react";
+import { ViewToggle, useViewMode, EmptyState } from "@/components/mtools/view-toggle";
 import { ToolIcon } from "@/components/mtools/icon";
 import { IconPicker } from "@/components/mtools/icon-picker";
 import { DEFAULT_CATEGORIES, TOOL_TAGS, TOOL_STATUSES, statusMeta } from "@/lib/tool-meta";
@@ -31,7 +32,7 @@ function AdminTools() {
   const { data: cats } = useQuery(toolCategoriesQuery());
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const [view, setView] = useState<"cards" | "table">("cards");
+  const { view, setView, locked } = useViewMode("admin-tools");
   const [q, setQ] = useState("");
   const [fCat, setFCat] = useState("all");
   const [newCat, setNewCat] = useState("");
@@ -100,10 +101,7 @@ function AdminTools() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-bold sm:text-2xl">Инструменты</h1>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-md border p-0.5">
-            <Button variant={view === "cards" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setView("cards")}><LayoutGrid className="h-4 w-4" /></Button>
-            <Button variant={view === "table" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setView("table")}><TableIcon className="h-4 w-4" /></Button>
-          </div>
+          <ViewToggle view={view} onChange={setView} locked={locked} />
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button className="gradient-brand text-white" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Новый</Button></DialogTrigger>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
@@ -219,7 +217,11 @@ function AdminTools() {
       </div>
 
       {view === "cards" ? (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader><CardTitle>Инструменты ({filtered.length})</CardTitle></CardHeader>
+          <CardContent>
+            {filtered.length === 0 && <EmptyState>Ничего не найдено</EmptyState>}
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((t: any) => {
             const sm = statusMeta(t);
             return (
@@ -246,9 +248,12 @@ function AdminTools() {
               </Card>
             );
           })}
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       ) : (
         <Card>
+          <CardHeader><CardTitle>Инструменты ({filtered.length})</CardTitle></CardHeader>
           <CardContent className="overflow-x-auto p-0">
             <table className="w-full min-w-[720px] text-sm">
               <thead className="border-b text-left text-xs text-muted-foreground">
@@ -294,6 +299,7 @@ function AdminTools() {
                 })}
               </tbody>
             </table>
+            {filtered.length === 0 && <div className="p-6"><EmptyState>Ничего не найдено</EmptyState></div>}
           </CardContent>
         </Card>
       )}

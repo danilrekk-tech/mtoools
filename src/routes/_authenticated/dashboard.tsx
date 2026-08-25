@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToolCard } from "@/components/mtools/tool-card";
+import { DeptDot } from "@/components/mtools/user-avatar";
 import { Play, Square, ArrowUpRight, ListTodo, LayoutGrid, SlidersHorizontal } from "lucide-react";
 import { ToolDialog, launchTool, type AnyTool } from "@/components/mtools/tool-launcher";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,9 +94,21 @@ function Dashboard() {
           <h1 className="text-2xl font-bold md:text-3xl">
             {greeting}, {me?.profile?.full_name?.split(" ")[0] ?? "коллега"} 👋
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {me?.profile?.department ? `Отдел: ${(me!.profile.department as any).name}` : "Отдел не назначен"}
-          </p>
+          {me?.profile?.department ? (
+            <span
+              className="mt-1 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium"
+              style={{
+                borderColor: `${(me!.profile.department as any).color ?? "#64748B"}55`,
+                backgroundColor: `${(me!.profile.department as any).color ?? "#64748B"}14`,
+                color: (me!.profile.department as any).color ?? undefined,
+              }}
+            >
+              <DeptDot color={(me!.profile.department as any).color} className="h-2 w-2" />
+              {(me!.profile.department as any).name}
+            </span>
+          ) : (
+            <p className="text-sm text-muted-foreground">Отдел не назначен</p>
+          )}
         </div>
         <Button asChild variant="outline"><Link to="/tools"><LayoutGrid className="mr-2 h-4 w-4" />Настроить дашборд</Link></Button>
       </div>

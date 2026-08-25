@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Trash2, Plus } from "lucide-react";
+import { DeptDot } from "@/components/mtools/user-avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
@@ -82,6 +83,9 @@ function AdminShifts() {
     else setAnchor(new Date(anchor.getFullYear(), anchor.getMonth() + dir, 1));
   };
 
+  const deptColor = (u: any) =>
+    u?.department?.color ?? (departments as any[]).find((d) => d.id === u?.department_id)?.color ?? "#1E4FD9";
+
   const cellShifts = (uid: string, day: Date) =>
     shifts.filter((s: any) => s.user_id === uid && sameDay(new Date(s.starts_at), day));
 
@@ -90,7 +94,8 @@ function AdminShifts() {
     starts.setHours(9, 0, 0, 0);
     const ends = new Date(day);
     ends.setHours(18, 0, 0, 0);
-    setEditing({ id: null, user_id: uid, starts_at: toLocalInput(starts), ends_at: toLocalInput(ends), title: "", color: "#1E4FD9" });
+    const u = (users as any[]).find((x) => x.id === uid);
+    setEditing({ id: null, user_id: uid, starts_at: toLocalInput(starts), ends_at: toLocalInput(ends), title: "", color: deptColor(u) });
   };
 
   const openEdit = (s: any) =>
@@ -100,7 +105,7 @@ function AdminShifts() {
       starts_at: toLocalInput(new Date(s.starts_at)),
       ends_at: toLocalInput(new Date(s.ends_at)),
       title: s.title ?? "",
-      color: s.color ?? "#1E4FD9",
+      color: s.color ?? deptColor((users as any[]).find((x) => x.id === s.user_id)),
     });
 
   const save = async () => {
@@ -199,9 +204,12 @@ function AdminShifts() {
               )}
               {visibleUsers.map((u: any) => (
                 <div key={u.id} className="grid border-b last:border-b-0" style={{ gridTemplateColumns: gridCols }}>
-                  <div className="min-w-0 border-r p-2">
-                    <div className="truncate text-sm font-medium">{u.full_name ?? u.email}</div>
-                    <div className="truncate text-[10px] text-muted-foreground">{u.department?.name ?? "—"}</div>
+                  <div className="min-w-0 border-r p-2" style={{ boxShadow: `inset 3px 0 0 ${deptColor(u)}` }}>
+                    <div className="truncate pl-1.5 text-sm font-medium">{u.full_name ?? u.email}</div>
+                    <div className="flex items-center gap-1.5 pl-1.5">
+                      <DeptDot color={deptColor(u)} className="h-2 w-2" />
+                      <span className="truncate text-[10px] text-muted-foreground">{u.department?.name ?? "Без отдела"}</span>
+                    </div>
                   </div>
                   {days.map((d) => {
                     const cs = cellShifts(u.id, d);
@@ -223,10 +231,10 @@ function AdminShifts() {
                               key={s.id}
                               title={`${new Date(s.starts_at).toLocaleTimeString("ru-RU", { timeStyle: "short" })}–${new Date(s.ends_at).toLocaleTimeString("ru-RU", { timeStyle: "short" })}`}
                               className="mx-auto h-3 w-3 rounded-full"
-                              style={{ backgroundColor: s.color ?? "#1E4FD9" }}
+                              style={{ backgroundColor: s.color ?? deptColor(u) }}
                             />
                           ) : (
-                            <div key={s.id} className="rounded px-1.5 py-1 text-[11px] text-white shadow-sm" style={{ backgroundColor: s.color ?? "#1E4FD9" }}>
+                            <div key={s.id} className="rounded px-1.5 py-1 text-[11px] text-white shadow-sm" style={{ backgroundColor: s.color ?? deptColor(u) }}>
                               <div className="font-semibold">
                                 {new Date(s.starts_at).toLocaleTimeString("ru-RU", { timeStyle: "short" })}–
                                 {new Date(s.ends_at).toLocaleTimeString("ru-RU", { timeStyle: "short" })}

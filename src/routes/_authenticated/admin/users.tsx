@@ -12,11 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Send, Search, Download, LayoutGrid, Table as TableIcon } from "lucide-react";
+import { Send, Search, Download } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { sendTelegramToUser } from "@/lib/telegram.functions";
 import { UserAvatar, DeptDot } from "@/components/mtools/user-avatar";
+import { ViewToggle, useViewMode, EmptyState } from "@/components/mtools/view-toggle";
 
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
@@ -36,7 +37,7 @@ function AdminUsers() {
   const [q, setQ] = useState("");
   const [fDept, setFDept] = useState("all");
   const [fRole, setFRole] = useState("all");
-  const [view, setView] = useState<"cards" | "table">("cards");
+  const { view, setView, locked } = useViewMode("admin-users");
 
   const setDepartment = async (userId: string, deptId: string) => {
     const { error } = await supabase.from("profiles").update({ department_id: deptId === "none" ? null : deptId }).eq("id", userId);
@@ -109,10 +110,7 @@ function AdminUsers() {
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <h1 className="text-xl font-bold sm:text-2xl">Пользователи</h1>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-md border p-0.5">
-            <Button variant={view === "cards" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setView("cards")}><LayoutGrid className="h-4 w-4" /></Button>
-            <Button variant={view === "table" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setView("table")}><TableIcon className="h-4 w-4" /></Button>
-          </div>
+          <ViewToggle view={view} onChange={setView} locked={locked} />
           <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />CSV</Button>
         </div>
       </div>
@@ -167,6 +165,7 @@ function AdminUsers() {
                   <th className="p-3">Роли</th>
                   <th className="p-3">Telegram</th>
                   <th className="p-3">Доступ</th>
+                  <th className="p-3 text-right">Действия</th>
                 </tr>
               </thead>
               <tbody>
@@ -196,18 +195,31 @@ function AdminUsers() {
                       </td>
                       <td className="p-3 text-xs">{u.telegram_chat_id ? `@${u.telegram_username ?? "linked"}` : "—"}</td>
                       <td className="p-3"><Switch checked={u.is_active !== false} onCheckedChange={(v) => toggleActive(u.id, v)} /></td>
+                      <td className="p-3 text-right">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          disabled={!u.telegram_chat_id}
+                          title={u.telegram_chat_id ? "Написать в Telegram" : "Telegram не привязан"}
+                          onClick={() => setDm({ user: u, text: "" })}
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+            {filtered.length === 0 && <div className="p-6"><EmptyState>Никого не найдено</EmptyState></div>}
           </CardContent>
         </Card>
       ) : (
       <Card>
         <CardHeader><CardTitle>Сотрудники ({filtered.length})</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          {filtered.length === 0 && <div className="text-sm text-muted-foreground">Никого не найдено</div>}
+          {filtered.length === 0 && <EmptyState>Никого не найдено</EmptyState>}
           {filtered.map((u: any) => {
             const dept = (departments ?? []).find((d: any) => d.id === u.department_id);
             return (
