@@ -87,76 +87,38 @@ export function ToolCard({
         className="relative p-5 pb-4"
         style={{ backgroundImage: `radial-gradient(120% 130% at 0% 0%, ${color}2e, transparent 70%)` }}
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-start gap-3">
-            <span
-              className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-background/80 shadow-sm backdrop-blur transition-transform duration-300 ${
-                unavailable ? "text-muted-foreground" : "group-hover:-rotate-3 group-hover:scale-110"
-              }`}
-              style={unavailable ? undefined : { color, borderColor: `${color}33`, boxShadow: `0 6px 18px -10px ${color}` }}
-            >
-              {st.key === "unavailable" ? (
-                <Unlink className="h-5 w-5" />
-              ) : (
-                <ToolIcon icon={tool.icon} iconMode={tool.icon_mode} url={tool.url} className="h-6 w-6" />
+        <div className="flex min-w-0 items-start gap-3">
+          <span
+            className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-background/80 shadow-sm backdrop-blur transition-transform duration-300 ${
+              unavailable ? "text-muted-foreground" : "group-hover:-rotate-3 group-hover:scale-110"
+            }`}
+            style={unavailable ? undefined : { color, borderColor: `${color}33`, boxShadow: `0 6px 18px -10px ${color}` }}
+          >
+            {st.key === "unavailable" ? (
+              <Unlink className="h-5 w-5" />
+            ) : (
+              <ToolIcon icon={tool.icon} iconMode={tool.icon_mode} url={tool.url} className="h-6 w-6" />
+            )}
+          </span>
+          <div className="min-w-0 flex-1 pt-0.5">
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <p className="min-w-0 flex-1 break-words text-[15px] font-semibold leading-tight">{tool.name}</p>
+              {isNew && (
+                <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-500">NEW</span>
               )}
-            </span>
-            <div className="min-w-0 pt-0.5">
-              <p className="truncate text-[15px] font-semibold leading-tight">{tool.name}</p>
-              <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
-                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                  {!unavailable && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />}
-                  <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${st.dot}`} />
-                </span>
-                <span className={st.key === "online" ? "text-emerald-500" : undefined}>{st.label}</span>
-                <span>·</span>
-                <span>{access}</span>
-              </p>
+              {isBeta && (
+                <span className="rounded-md bg-violet-500/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-violet-400">BETA</span>
+              )}
             </div>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-0.5">
-            {isNew && (
-              <span className="mr-1 rounded-md bg-emerald-500/15 px-2 py-1 text-[10px] font-bold tracking-wide text-emerald-500">NEW</span>
-            )}
-            {isBeta && (
-              <span className="mr-1 rounded-md bg-violet-500/15 px-2 py-1 text-[10px] font-bold tracking-wide text-violet-400">BETA</span>
-            )}
-            {onToggleFavorite && (
-              <button
-                type="button"
-                onClick={onToggleFavorite}
-                aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-background/70 hover:text-foreground"
-              >
-                <Star className={`h-4 w-4 transition ${favorite ? "scale-110 fill-amber-400 text-amber-400" : ""}`} />
-              </button>
-            )}
-            {onSetLocation && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-background/70 hover:text-foreground"
-                    aria-label="Действия с инструментом"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={onOpen}>Открыть инструмент</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onSetLocation("dashboard")}>
-                    <Pin className="mr-2 h-4 w-4" />
-                    На дашборд
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onSetLocation("sidebar")}>В боковое меню</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onSetLocation("hidden")}>Скрыть</DropdownMenuItem>
-                  {location && <DropdownMenuSeparator />}
-                  {location && <div className="px-2 py-1.5 text-[11px] text-muted-foreground">Сейчас: {location === "dashboard" ? "на дашборде" : location === "sidebar" ? "в меню" : "скрыт"}</div>}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                {!unavailable && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />}
+                <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${st.dot}`} />
+              </span>
+              <span className={st.key === "online" ? "text-emerald-500" : undefined}>{st.label}</span>
+              <span>·</span>
+              <span>{access}</span>
+            </p>
           </div>
         </div>
       </div>
@@ -225,25 +187,67 @@ export function ToolCard({
         )}
 
         <div className="mt-auto pt-4">
-          {unavailable ? (
-            <div className="space-y-2">
-              <Button className="w-full" disabled>Недоступно</Button>
-              <Button variant="outline" size="sm" className="w-full" asChild>
-                <a href="/telegram"><LifeBuoy className="mr-2 h-3.5 w-3.5" />Сообщить в поддержку</a>
+          <div className="flex items-center gap-2">
+            {unavailable ? (
+              <Button className="flex-1" disabled>Недоступно</Button>
+            ) : (
+              <Button
+                onClick={onOpen}
+                className="group/btn flex-1 border-0 text-white shadow-sm transition-shadow hover:shadow-md"
+                style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}b3)` }}
+              >
+                {actionLabel}
+                {tool.kind === "external" ? (
+                  <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                ) : (
+                  <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                )}
               </Button>
-            </div>
-          ) : (
-            <Button
-              onClick={onOpen}
-              className="group/btn w-full border-0 text-white shadow-sm transition-shadow hover:shadow-md"
-              style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}b3)` }}
-            >
-              {actionLabel}
-              {tool.kind === "external" ? (
-                <ExternalLink className="ml-2 h-3.5 w-3.5" />
-              ) : (
-                <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-              )}
+            )}
+
+            {onToggleFavorite && (
+              <button
+                type="button"
+                onClick={onToggleFavorite}
+                aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              >
+                <Star className={`h-4 w-4 transition ${favorite ? "scale-110 fill-amber-400 text-amber-400" : ""}`} />
+              </button>
+            )}
+            {onSetLocation && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    aria-label="Действия с инструментом"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={onOpen}>Открыть инструмент</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onSetLocation("dashboard")}>
+                    <Pin className="mr-2 h-4 w-4" />
+                    На дашборд
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetLocation("sidebar")}>В боковое меню</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetLocation("hidden")}>Скрыть</DropdownMenuItem>
+                  {location && <DropdownMenuSeparator />}
+                  {location && (
+                    <div className="px-2 py-1.5 text-[11px] text-muted-foreground">
+                      Сейчас: {location === "dashboard" ? "на дашборде" : location === "sidebar" ? "в меню" : "скрыт"}
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+          {unavailable && (
+            <Button variant="outline" size="sm" className="mt-2 w-full" asChild>
+              <a href="/telegram"><LifeBuoy className="mr-2 h-3.5 w-3.5" />Сообщить в поддержку</a>
             </Button>
           )}
         </div>

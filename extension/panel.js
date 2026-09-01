@@ -13,6 +13,88 @@ tabs.forEach((b) =>
   }),
 );
 
+// quick launcher + search
+const TOOL_LABELS = {
+  calc: "Калькулятор", pass: "Пароли", conv: "Конвертер", notes: "Заметки",
+  pomo: "Помодоро", text: "Текст", color: "Цвет", date: "Даты", util: "Утилиты", links: "Сервисы",
+};
+const toolSearch = document.getElementById("toolSearch");
+const quickButtons = document.querySelectorAll("[data-quick]");
+const activateTool = (tool) => {
+  const b = document.querySelector(`#tabs button[data-t="${tool}"]`);
+  if (b) b.click();
+  quickButtons.forEach((x) => x.classList.toggle("active", x.dataset.quick === tool));
+};
+quickButtons.forEach((b) => b.addEventListener("click", () => {
+  activateTool(b.dataset.quick);
+  toolSearch?.focus();
+  toolSearch?.select();
+}));
+toolSearch?.addEventListener("input", () => {
+  const q = toolSearch.value.trim().toLowerCase();
+  tabs.forEach((b) => {
+    const match = !q || (TOOL_LABELS[b.dataset.t] || b.textContent).toLowerCase().includes(q);
+    b.classList.toggle("quick-match-hidden", !match);
+  });
+  if (q) {
+    const first = [...tabs].find((b) => !b.classList.contains("quick-match-hidden"));
+    if (first) activateTool(first.dataset.t);
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
+    e.preventDefault();
+    toolSearch?.focus();
+  }
+  if (e.key === "Escape" && document.activeElement === toolSearch) {
+    toolSearch.value = "";
+    toolSearch.dispatchEvent(new Event("input"));
+    toolSearch.blur();
+  }
+});
+document.getElementById("openSideInfo")?.addEventListener("click", () => {
+  toolSearch?.focus();
+});
+
+// Context-menu actions are staged by the background service worker.
+async function consumeContextAction() {
+  if (!chrome.storage?.local) return;
+  chrome.storage.local.get(["mtools_context_action"], (r) => {
+    const action = r?.mtools_context_action;
+    if (!action || !action.createdAt || Date.now() - action.createdAt > 10 * 60 * 1000) return;
+    chrome.storage.local.remove("mtools_context_action");
+    if (!action.tool) return;
+    activateTool(action.tool);
+    const selection = action.selection || "";
+    if (action.tool === "calc" && selection) {
+      document.getElementById("calcExpr").value = selection.replace(/[^0-9+\-*/%().\s]/g, "");
+      document.getElementById("calcRes").textContent = "Готово — нажмите =";
+    }
+    if (action.tool === "conv") {
+      const n = Number(selection.replace(/,/g, ".").trim());
+      if (Number.isFinite(n)) document.getElementById("convVal").value = n;
+      convert();
+    }
+    if (action.tool === "text" && selection) {
+      const input = document.getElementById("txtIn");
+      input.value = selection;
+      if (action.action === "upper") input.value = input.value.toUpperCase();
+      if (action.action === "lower") input.value = input.value.toLowerCase();
+      if (action.action === "trim") input.value = input.value.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+      input.dispatchEvent(new Event("input"));
+    }
+    if (action.tool === "color" && selection) {
+      const match = selection.match(/#[0-9a-f]{6}\b/i);
+      if (match) {
+        document.getElementById("colHex").value = match[0].toUpperCase();
+        renderColor();
+      } else {
+        document.getElementById("colOut").textContent = "Выделите HEX-цвет, например #5B4BFF";
+      }
+    }
+  });
+}
+
 // calculator
 const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","=","+","C","(",")","%"];
 const pad = document.getElementById("calcPad");
@@ -360,3 +442,6 @@ document.getElementById("rndGo").addEventListener("click", () => {
   const [lo, hi] = a <= b ? [a, b] : [b, a];
   document.getElementById("rndOut").textContent = String(lo + Math.floor(Math.random() * (hi - lo + 1)));
 });
+
+
+consumeContextAction();
