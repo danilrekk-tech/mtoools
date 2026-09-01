@@ -187,25 +187,67 @@ export function ToolCard({
         )}
 
         <div className="mt-auto pt-4">
-          {unavailable ? (
-            <div className="space-y-2">
-              <Button className="w-full" disabled>Недоступно</Button>
-              <Button variant="outline" size="sm" className="w-full" asChild>
-                <a href="/telegram"><LifeBuoy className="mr-2 h-3.5 w-3.5" />Сообщить в поддержку</a>
+          <div className="flex items-center gap-2">
+            {unavailable ? (
+              <Button className="flex-1" disabled>Недоступно</Button>
+            ) : (
+              <Button
+                onClick={onOpen}
+                className="group/btn flex-1 border-0 text-white shadow-sm transition-shadow hover:shadow-md"
+                style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}b3)` }}
+              >
+                {actionLabel}
+                {tool.kind === "external" ? (
+                  <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                ) : (
+                  <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                )}
               </Button>
-            </div>
-          ) : (
-            <Button
-              onClick={onOpen}
-              className="group/btn w-full border-0 text-white shadow-sm transition-shadow hover:shadow-md"
-              style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}b3)` }}
-            >
-              {actionLabel}
-              {tool.kind === "external" ? (
-                <ExternalLink className="ml-2 h-3.5 w-3.5" />
-              ) : (
-                <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-              )}
+            )}
+
+            {onToggleFavorite && (
+              <button
+                type="button"
+                onClick={onToggleFavorite}
+                aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              >
+                <Star className={`h-4 w-4 transition ${favorite ? "scale-110 fill-amber-400 text-amber-400" : ""}`} />
+              </button>
+            )}
+            {onSetLocation && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    aria-label="Действия с инструментом"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={onOpen}>Открыть инструмент</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onSetLocation("dashboard")}>
+                    <Pin className="mr-2 h-4 w-4" />
+                    На дашборд
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetLocation("sidebar")}>В боковое меню</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetLocation("hidden")}>Скрыть</DropdownMenuItem>
+                  {location && <DropdownMenuSeparator />}
+                  {location && (
+                    <div className="px-2 py-1.5 text-[11px] text-muted-foreground">
+                      Сейчас: {location === "dashboard" ? "на дашборде" : location === "sidebar" ? "в меню" : "скрыт"}
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+          {unavailable && (
+            <Button variant="outline" size="sm" className="mt-2 w-full" asChild>
+              <a href="/telegram"><LifeBuoy className="mr-2 h-3.5 w-3.5" />Сообщить в поддержку</a>
             </Button>
           )}
         </div>
