@@ -7,10 +7,31 @@
 </head>
 <body>
 <header>
-  <div class="logo"><span>M</span>tools</div>
-  <a class="open" id="openApp" href="#" target="_blank" rel="noopener">Открыть сервис ↗</a>
+  <div class="brand-wrap">
+    <div class="logo"><span>M</span>tools</div>
+    <div class="brand-sub">быстрые инструменты</div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="openSideInfo" title="Горячая клавиша Ctrl+Shift+M">⌘</button>
+    <a class="open" id="openApp" href="#" target="_blank" rel="noopener">Сервис ↗</a>
+  </div>
 </header>
-<nav id="tabs">
+<section class="launcher">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input id="toolSearch" type="search" placeholder="Найти инструмент…" autocomplete="off" />
+    <kbd>/</kbd>
+  </div>
+  <div class="quick-row" id="quickRow">
+    <button class="quick active" data-quick="calc"><span>⌗</span>Калькулятор</button>
+    <button class="quick" data-quick="text"><span>Tx</span>Текст</button>
+    <button class="quick" data-quick="conv"><span>⇄</span>Конвертер</button>
+    <button class="quick" data-quick="notes"><span>✎</span>Заметки</button>
+    <button class="quick" data-quick="pomo"><span>◷</span>Фокус</button>
+  </div>
+  <div class="context-hint">Правый клик → <strong>MTools</strong> для быстрого вызова инструментов</div>
+</section>
+<nav id="tabs" aria-label="Инструменты">
   <button data-t="calc" class="active">Калькулятор</button>
   <button data-t="pass">Пароли</button>
   <button data-t="conv">Конвертер</button>

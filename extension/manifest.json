@@ -1,11 +1,17 @@
 {
   "manifest_version": 3,
   "name": "MTools — панель инструментов",
-  "version": "1.3.0",
-  "description": "Быстрый доступ к интерактивным инструментам MTools: калькулятор, генератор паролей, конвертер, заметки, помодоро.",
-  "permissions": ["storage", "sidePanel"],
+  "version": "1.4.0",
+  "description": "Быстрый доступ к инструментам MTools из браузера и контекстного меню.",
+  "permissions": ["storage", "sidePanel", "contextMenus"],
   "action": { "default_title": "MTools", "default_popup": "panel.html", "default_icon": "icon.png" },
   "side_panel": { "default_path": "panel.html" },
   "background": { "service_worker": "background.js" },
+  "commands": {
+    "open-mtools": {
+      "suggested_key": { "default": "Ctrl+Shift+M", "mac": "MacCtrl+Shift+M" },
+      "description": "Открыть MTools"
+    }
+  },
   "icons": { "48": "icon.png", "128": "icon.png" }
 }
