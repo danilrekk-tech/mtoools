@@ -26,7 +26,7 @@ function Landing() {
     return null;
   }
   return (
-    <div className="min-h-screen bg-background">
+    <div className="mtools-shell min-h-screen bg-background">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <MToolsLogo className="text-3xl" />
         <div className="flex gap-2">
@@ -59,7 +59,7 @@ function Landing() {
             { icon: Send, title: "Telegram-бот", text: "Разный функционал для каждого отдела." },
             { icon: ShieldCheck, title: "Безопасность", text: "Роли, RLS и авторизация Google/Email." },
           ].map((f) => (
-            <div key={f.title} className="rounded-xl border bg-card p-5">
+            <div key={f.title} className="rounded-2xl border bg-card/85 p-5 shadow-[0_16px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_55px_rgba(0,0,0,0.18)]">
               <f.icon className="h-6 w-6 text-primary" />
               <div className="mt-3 font-semibold">{f.title}</div>
               <div className="mt-1 text-sm text-muted-foreground">{f.text}</div>

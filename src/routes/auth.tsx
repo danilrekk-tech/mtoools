@@ -72,7 +72,7 @@ function AuthPage() {
   };
 
   return (
-    <div className="grid min-h-screen md:grid-cols-2">
+    <div className="mtools-shell grid min-h-screen md:grid-cols-2">
       <div className="hidden gradient-brand p-10 text-white md:flex md:flex-col md:justify-between">
         <MToolsLogo className="h-10 brightness-0 invert" />
         <div>
@@ -82,7 +82,7 @@ function AuthPage() {
         <div className="text-sm text-white/60">© MTools</div>
       </div>
       <div className="flex items-center justify-center bg-background p-6">
-        <Card className="w-full max-w-md p-6">
+        <Card className="w-full max-w-md border-white/10 bg-card/90 p-6 shadow-[0_22px_60px_rgba(0,0,0,0.20)] backdrop-blur-xl">
           <div className="mb-6 flex flex-col items-center gap-2 md:hidden">
             <MToolsLogo className="h-10" />
           </div>

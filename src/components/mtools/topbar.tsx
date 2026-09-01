@@ -47,7 +47,7 @@ export function TopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur md:px-4">
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-border/70 bg-background/78 px-3 backdrop-blur-xl md:px-5">
       <SidebarTrigger />
       <div className="flex-1" />
       <Popover onOpenChange={(o) => o && unread > 0 && markAllRead()}>
