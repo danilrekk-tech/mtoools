@@ -66,8 +66,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b">
-        <Link to="/" className="flex items-center gap-2 px-2 py-3">
+      <SidebarHeader className="border-b border-sidebar-border/70 px-2">
+        <Link to="/" className="flex items-center gap-2 rounded-xl px-2 py-3">
           <MToolsLogo className="text-2xl" />
         </Link>
       </SidebarHeader>

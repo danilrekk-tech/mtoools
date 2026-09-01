@@ -17,11 +17,11 @@ export const Route = createFileRoute("/_authenticated")({
 function Layout() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="mtools-shell flex min-h-screen w-full">
         <AppSidebar />
         <SidebarInset className="min-w-0 flex-1">
           <TopBar />
-          <main className="min-w-0 flex-1 p-4 md:p-6">
+          <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-7">
             <Outlet />
           </main>
         </SidebarInset>

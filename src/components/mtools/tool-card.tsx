@@ -1,9 +1,26 @@
 import { ToolIcon } from "@/components/mtools/icon";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, ArrowUpRight, ChevronDown, ExternalLink, LifeBuoy, Star, Unlink } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  ChevronDown,
+  ExternalLink,
+  LifeBuoy,
+  MoreHorizontal,
+  Pin,
+  Star,
+  Unlink,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import { statusMeta } from "@/lib/tool-meta";
 import type { AnyTool } from "@/components/mtools/tool-launcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export type ToolLike = AnyTool & {
   icon?: string | null;
@@ -23,12 +40,16 @@ export function ToolCard({
   footer,
   favorite,
   onToggleFavorite,
+  location,
+  onSetLocation,
 }: {
   tool: ToolLike;
   onOpen: () => void;
   footer?: React.ReactNode;
   favorite?: boolean;
   onToggleFavorite?: () => void;
+  location?: "dashboard" | "sidebar" | "hidden";
+  onSetLocation?: (location: "dashboard" | "sidebar" | "hidden") => void;
 }) {
   const color = tool.color ?? "#1E4FD9";
   const st = statusMeta(tool);
@@ -37,13 +58,16 @@ export function ToolCard({
   const panel = useRef<HTMLDivElement>(null);
   const features = (tool.features ?? []).filter(Boolean);
   const tags = (tool.tags ?? []).filter(Boolean).slice(0, 2);
-  const access = tool.kind === "external" ? "внешний" : "внутренний";
+  const access = tool.kind === "external" ? "Внешний" : "Внутренний";
+  const isNew = (tool.tags ?? []).some((tag) => tag.toLowerCase() === "новое");
+  const isBeta = (tool.tags ?? []).some((tag) => tag.toLowerCase() === "beta");
+  const actionLabel = tool.kind === "external" ? "Открыть" : "Запустить";
 
   return (
     <div
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 ${
         unavailable
-          ? "opacity-70 saturate-50"
+          ? "hover:-translate-y-0.5"
           : "hover:-translate-y-1 hover:border-transparent hover:shadow-[0_18px_40px_-18px_var(--tool-glow)]"
       }`}
       style={
@@ -53,7 +77,6 @@ export function ToolCard({
         } as React.CSSProperties
       }
     >
-      {/* accent rail */}
       <span
         aria-hidden
         className="absolute inset-x-0 top-0 h-1 opacity-70 transition-opacity group-hover:opacity-100"
@@ -64,7 +87,7 @@ export function ToolCard({
         className="relative p-5 pb-4"
         style={{ backgroundImage: `radial-gradient(120% 130% at 0% 0%, ${color}2e, transparent 70%)` }}
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
             <span
               className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-background/80 shadow-sm backdrop-blur transition-transform duration-300 ${
@@ -78,29 +101,63 @@ export function ToolCard({
                 <ToolIcon icon={tool.icon} iconMode={tool.icon_mode} url={tool.url} className="h-6 w-6" />
               )}
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 pt-0.5">
               <p className="truncate text-[15px] font-semibold leading-tight">{tool.name}</p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="relative flex h-1.5 w-1.5">
-                  {!unavailable && (
-                    <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-70 ${st.dot}`} />
-                  )}
+              <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
+                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                  {!unavailable && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />}
                   <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${st.dot}`} />
                 </span>
-                {st.label} · {access}
+                <span className={st.key === "online" ? "text-emerald-500" : undefined}>{st.label}</span>
+                <span>·</span>
+                <span>{access}</span>
               </p>
             </div>
           </div>
-          {onToggleFavorite && (
-            <button
-              type="button"
-              onClick={onToggleFavorite}
-              aria-label={favorite ? "Убрать из «Мои инструменты»" : "В «Мои инструменты»"}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-background/70 hover:text-foreground"
-            >
-              <Star className={`h-4 w-4 transition ${favorite ? "scale-110 fill-amber-400 text-amber-400" : ""}`} />
-            </button>
-          )}
+
+          <div className="flex shrink-0 items-center gap-0.5">
+            {isNew && (
+              <span className="mr-1 rounded-md bg-emerald-500/15 px-2 py-1 text-[10px] font-bold tracking-wide text-emerald-500">NEW</span>
+            )}
+            {isBeta && (
+              <span className="mr-1 rounded-md bg-violet-500/15 px-2 py-1 text-[10px] font-bold tracking-wide text-violet-400">BETA</span>
+            )}
+            {onToggleFavorite && (
+              <button
+                type="button"
+                onClick={onToggleFavorite}
+                aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-background/70 hover:text-foreground"
+              >
+                <Star className={`h-4 w-4 transition ${favorite ? "scale-110 fill-amber-400 text-amber-400" : ""}`} />
+              </button>
+            )}
+            {onSetLocation && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-background/70 hover:text-foreground"
+                    aria-label="Действия с инструментом"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={onOpen}>Открыть инструмент</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onSetLocation("dashboard")}>
+                    <Pin className="mr-2 h-4 w-4" />
+                    На дашборд
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetLocation("sidebar")}>В боковое меню</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetLocation("hidden")}>Скрыть</DropdownMenuItem>
+                  {location && <DropdownMenuSeparator />}
+                  {location && <div className="px-2 py-1.5 text-[11px] text-muted-foreground">Сейчас: {location === "dashboard" ? "на дашборде" : location === "sidebar" ? "в меню" : "скрыт"}</div>}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </div>
 
@@ -115,13 +172,15 @@ export function ToolCard({
                 {tool.category}
               </span>
             )}
-            {tags.map((t) => (
-              <span key={t} className="rounded-md bg-muted px-2.5 py-0.5 text-[11px] text-muted-foreground">{t}</span>
-            ))}
+            {tags
+              .filter((tag) => !["новое", "beta"].includes(tag.toLowerCase()))
+              .map((tag) => (
+                <span key={tag} className="rounded-md bg-muted px-2.5 py-0.5 text-[11px] text-muted-foreground">{tag}</span>
+              ))}
           </div>
         )}
 
-        <p className="line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+        <p className="min-h-[3.5rem] line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">
           {tool.description || "Откройте инструмент в один клик"}
         </p>
 
@@ -179,7 +238,7 @@ export function ToolCard({
               className="group/btn w-full border-0 text-white shadow-sm transition-shadow hover:shadow-md"
               style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}b3)` }}
             >
-              Открыть
+              {actionLabel}
               {tool.kind === "external" ? (
                 <ExternalLink className="ml-2 h-3.5 w-3.5" />
               ) : (
