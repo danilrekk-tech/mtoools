@@ -6,136 +6,193 @@
 <link rel="stylesheet" href="panel.css" />
 </head>
 <body>
-<header>
-  <div class="brand-wrap">
-    <div class="logo"><span>M</span>tools</div>
-    <div class="brand-sub">быстрые инструменты</div>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">M</span>
+    <span class="brand-name">MTOOLS</span>
   </div>
-  <div class="header-actions">
-    <button class="icon-btn" id="openSideInfo" title="Горячая клавиша Ctrl+Shift+M">⌘</button>
-    <a class="open" id="openApp" href="#" target="_blank" rel="noopener">Сервис ↗</a>
+  <div class="top-actions">
+    <button class="icon-btn" id="pinBtn" title="Закрепить панель">⌖</button>
+    <button class="icon-btn" id="settingsBtn" title="Настройки">⚙</button>
   </div>
 </header>
-<section class="launcher">
-  <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input id="toolSearch" type="search" placeholder="Найти инструмент…" autocomplete="off" />
-    <kbd>/</kbd>
-  </div>
-  <div class="quick-row" id="quickRow">
-    <button class="quick active" data-quick="calc"><span>⌗</span>Калькулятор</button>
-    <button class="quick" data-quick="text"><span>Tx</span>Текст</button>
-    <button class="quick" data-quick="conv"><span>⇄</span>Конвертер</button>
-    <button class="quick" data-quick="notes"><span>✎</span>Заметки</button>
-    <button class="quick" data-quick="pomo"><span>◷</span>Фокус</button>
-  </div>
-  <div class="context-hint">Правый клик → <strong>MTools</strong> для быстрого вызова инструментов</div>
-</section>
-<nav id="tabs" aria-label="Инструменты">
-  <button data-t="calc" class="active">Калькулятор</button>
-  <button data-t="pass">Пароли</button>
-  <button data-t="conv">Конвертер</button>
-  <button data-t="notes">Заметки</button>
-  <button data-t="pomo">Помодоро</button>
-  <button data-t="text">Текст</button>
-  <button data-t="color">Цвет</button>
-  <button data-t="date">Даты</button>
-  <button data-t="util">Утилиты</button>
-  <button data-t="links">Сервисы</button>
-</nav>
+
+<div class="search-wrap">
+  <span class="search-icon">⌕</span>
+  <input id="toolSearch" type="text" placeholder="Поиск инструментов…" autocomplete="off" />
+  <kbd id="searchHint">Ctrl+K</kbd>
+  <button class="clear-btn hidden" id="searchClear" title="Очистить">✕</button>
+</div>
+
 <main>
-  <section id="calc" class="card">
-    <input id="calcExpr" placeholder="0" readonly />
-    <div class="res" id="calcRes">0</div>
-    <div class="grid" id="calcPad"></div>
-  </section>
-
-  <section id="pass" class="card hidden">
-    <input id="passOut" readonly placeholder="Нажмите «Сгенерировать»" />
-    <div class="row"><label class="muted">Длина <input id="passLen" type="number" min="6" max="64" value="16" /></label></div>
-    <div class="row">
-      <label class="muted"><input type="checkbox" id="pUp" checked style="width:auto"> A-Z</label>
-      <label class="muted"><input type="checkbox" id="pNum" checked style="width:auto"> 0-9</label>
-      <label class="muted"><input type="checkbox" id="pSym" checked style="width:auto"> !@#</label>
+  <!-- ГЛАВНАЯ -->
+  <section id="viewHome">
+    <div class="sec-head">
+      <h2>Быстрый доступ</h2>
+      <button class="link-btn" id="configQuick">Настроить</button>
     </div>
-    <div class="row"><button class="btn primary" id="passGen">Сгенерировать</button><button class="btn" id="passCopy">Копировать</button></div>
-  </section>
+    <div class="quick-grid" id="quickGrid"></div>
 
-  <section id="conv" class="card hidden">
-    <select id="convKind">
-      <option value="len">Длина</option><option value="mass">Масса</option><option value="temp">Температура</option>
-    </select>
-    <div class="row"><input id="convVal" type="number" value="1" /></div>
-    <div class="row"><select id="convFrom"></select><select id="convTo"></select></div>
-    <div class="res" id="convRes">—</div>
-  </section>
+    <div class="sec-head">
+      <h2>Недавние инструменты</h2>
+      <button class="link-btn hidden" id="clearRecent">Очистить</button>
+    </div>
+    <div class="recent-list" id="recentList"></div>
 
-  <section id="notes" class="card hidden">
-    <textarea id="notesArea" placeholder="Заметки сохраняются автоматически…"></textarea>
-    <div class="muted" id="notesSaved">&nbsp;</div>
-  </section>
-
-  <section id="pomo" class="card hidden">
-    <div class="timer" id="pomoTime">25:00</div>
-    <div class="row"><button class="btn primary" id="pomoStart">Старт</button><button class="btn" id="pomoReset">Сброс</button></div>
-    <div class="muted" id="pomoMode">Фокус</div>
-  </section>
-  <section id="text" class="card hidden">
-    <textarea id="txtIn" placeholder="Введите текст…" style="min-height:120px"></textarea>
-    <div class="muted" id="txtStat">0 символов · 0 слов</div>
-    <div class="grid" style="grid-template-columns:repeat(3,1fr)">
-      <button class="btn" data-tx="upper">ВЕРХНИЙ</button>
-      <button class="btn" data-tx="lower">нижний</button>
-      <button class="btn" data-tx="title">Заголовок</button>
-      <button class="btn" data-tx="b64e">→ Base64</button>
-      <button class="btn" data-tx="b64d">← Base64</button>
-      <button class="btn" data-tx="json">JSON</button>
-      <button class="btn" data-tx="trim">Убрать пробелы</button>
-      <button class="btn" data-tx="copy">Копировать</button>
-      <button class="btn" data-tx="clear">Очистить</button>
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div><strong>Совет:</strong> вы можете вызывать инструменты через контекстное меню (ПКМ) в любом месте браузера.</div>
     </div>
   </section>
 
-  <section id="color" class="card hidden">
-    <div class="row"><input id="colHex" value="#1E4FD9" /><input id="colPick" type="color" value="#1E4FD9" style="width:52px;padding:2px" /></div>
-    <div id="colSwatch" style="height:64px;border-radius:10px;margin-top:10px;background:#1E4FD9"></div>
-    <div class="muted" id="colOut" style="margin-top:8px"></div>
-    <div class="row"><button class="btn" id="colRand">Случайный</button><button class="btn primary" id="colCopy">Копировать RGB</button></div>
+  <!-- ПОИСК -->
+  <section id="viewSearch" class="hidden">
+    <div class="result-list" id="resultList"></div>
+    <div class="kbd-hints">
+      <span><kbd>↑↓</kbd> навигация</span><span><kbd>Enter</kbd> выбор</span><span><kbd>Esc</kbd> закрыть</span>
+    </div>
   </section>
 
-  <section id="date" class="card hidden">
-    <label class="muted">Дата A<input id="dA" type="date" /></label>
-    <label class="muted" style="display:block;margin-top:8px">Дата B<input id="dB" type="date" /></label>
-    <div class="res" id="dDiff">—</div>
-    <div class="muted">Unix timestamp</div>
-    <div class="row"><input id="tsIn" placeholder="1730000000" /><button class="btn" id="tsGo">→</button></div>
-    <div class="muted" id="tsOut">&nbsp;</div>
-  </section>
+  <!-- ИНСТРУМЕНТ -->
+  <section id="viewTool" class="hidden">
+    <div class="tool-head">
+      <button class="icon-btn" id="backBtn" title="Назад">←</button>
+      <div class="tool-title" id="toolTitle">Инструмент</div>
+      <button class="icon-btn" id="favBtn" title="В быстрый доступ">☆</button>
+    </div>
 
+    <section id="calc" class="card hidden">
+      <input id="calcExpr" placeholder="0" />
+      <div class="res" id="calcRes">0</div>
+      <div class="grid" id="calcPad"></div>
+    </section>
 
-  <section id="util" class="card hidden">
-    <div class="muted">UUID v4</div>
-    <div class="row"><input id="uuidOut" readonly /><button class="btn primary" id="uuidGen">↻</button></div>
-    <div class="muted" style="margin-top:10px">SHA-256</div>
-    <div class="row"><input id="hashIn" placeholder="Строка" /><button class="btn" id="hashGo">→</button></div>
-    <div class="muted" id="hashOut" style="word-break:break-all">&nbsp;</div>
-    <div class="muted" style="margin-top:10px">Проценты</div>
-    <div class="row"><input id="pctA" type="number" placeholder="Сколько" /><input id="pctB" type="number" placeholder="% от" /><button class="btn" id="pctGo">=</button></div>
-    <div class="res" id="pctOut">—</div>
-    <div class="muted" style="margin-top:10px">Случайное число</div>
-    <div class="row"><input id="rndA" type="number" value="1" /><input id="rndB" type="number" value="100" /><button class="btn" id="rndGo">🎲</button></div>
-    <div class="res" id="rndOut">—</div>
-  </section>
-  <section id="links" class="card hidden">
-    <div class="row"><input id="syncToken" placeholder="Ключ синхронизации из /extension" /><button class="btn primary" id="syncGo">⟳</button></div>
-    <div class="muted" id="syncState">Вставьте ключ, чтобы подтянуть свои инструменты и сервисы.</div>
-    <div id="remoteList" style="margin-top:8px"></div>
-    <div class="muted" style="margin-top:12px">Свои ссылки</div>
-    <div id="linkList" style="margin-top:6px"></div>
-    <div class="row"><input id="lName" placeholder="Название" /></div>
-    <div class="row"><input id="lUrl" placeholder="https://..." /><button class="btn primary" id="lAdd">+</button></div>
+    <section id="pass" class="card hidden">
+      <input id="passOut" readonly placeholder="Нажмите «Сгенерировать»" />
+      <div class="row"><label class="muted">Длина <input id="passLen" type="number" min="6" max="64" value="16" /></label></div>
+      <div class="row">
+        <label class="muted"><input type="checkbox" id="pUp" checked style="width:auto"> A-Z</label>
+        <label class="muted"><input type="checkbox" id="pNum" checked style="width:auto"> 0-9</label>
+        <label class="muted"><input type="checkbox" id="pSym" checked style="width:auto"> !@#</label>
+      </div>
+      <div class="row"><button class="btn primary" id="passGen">Сгенерировать</button><button class="btn" id="passCopy">Копировать</button></div>
+    </section>
+
+    <section id="conv" class="card hidden">
+      <select id="convKind">
+        <option value="len">Длина</option><option value="mass">Масса</option><option value="temp">Температура</option>
+      </select>
+      <div class="row"><input id="convVal" type="number" value="1" /></div>
+      <div class="row"><select id="convFrom"></select><select id="convTo"></select></div>
+      <div class="res" id="convRes">—</div>
+    </section>
+
+    <section id="notes" class="card hidden">
+      <textarea id="notesArea" placeholder="Заметки сохраняются автоматически…"></textarea>
+      <div class="muted" id="notesSaved">&nbsp;</div>
+    </section>
+
+    <section id="pomo" class="card hidden">
+      <div class="timer" id="pomoTime">25:00</div>
+      <div class="row"><button class="btn primary" id="pomoStart">Старт</button><button class="btn" id="pomoReset">Сброс</button></div>
+      <div class="muted" id="pomoMode">Фокус</div>
+    </section>
+
+    <section id="text" class="card hidden">
+      <textarea id="txtIn" placeholder="Введите текст…" style="min-height:120px"></textarea>
+      <div class="muted" id="txtStat">0 символов · 0 слов</div>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+        <button class="btn" data-tx="upper">ВЕРХНИЙ</button>
+        <button class="btn" data-tx="lower">нижний</button>
+        <button class="btn" data-tx="title">Заголовок</button>
+        <button class="btn" data-tx="b64e">→ Base64</button>
+        <button class="btn" data-tx="b64d">← Base64</button>
+        <button class="btn" data-tx="json">JSON</button>
+        <button class="btn" data-tx="trim">Убрать пробелы</button>
+        <button class="btn" data-tx="copy">Копировать</button>
+        <button class="btn" data-tx="clear">Очистить</button>
+      </div>
+    </section>
+
+    <section id="color" class="card hidden">
+      <div class="row"><input id="colHex" value="#3B82F6" /><input id="colPick" type="color" value="#3B82F6" style="width:52px;padding:2px" /></div>
+      <div id="colSwatch" style="height:64px;border-radius:10px;margin-top:10px;background:#3B82F6"></div>
+      <div class="muted" id="colOut" style="margin-top:8px"></div>
+      <div class="row"><button class="btn" id="colRand">Случайный</button><button class="btn primary" id="colCopy">Копировать</button></div>
+    </section>
+
+    <section id="date" class="card hidden">
+      <label class="muted">Дата A<input id="dA" type="date" /></label>
+      <label class="muted" style="display:block;margin-top:8px">Дата B<input id="dB" type="date" /></label>
+      <div class="res" id="dDiff">—</div>
+      <div class="muted">Unix timestamp</div>
+      <div class="row"><input id="tsIn" placeholder="1730000000" /><button class="btn" id="tsGo">→</button></div>
+      <div class="muted" id="tsOut">&nbsp;</div>
+    </section>
+
+    <section id="util" class="card hidden">
+      <div class="muted">UUID v4</div>
+      <div class="row"><input id="uuidOut" readonly /><button class="btn primary" id="uuidGen">↻</button></div>
+      <div class="muted" style="margin-top:10px">SHA-256</div>
+      <div class="row"><input id="hashIn" placeholder="Строка" /><button class="btn" id="hashGo">→</button></div>
+      <div class="muted" id="hashOut" style="word-break:break-all">&nbsp;</div>
+      <div class="muted" style="margin-top:10px">Проценты</div>
+      <div class="row"><input id="pctA" type="number" placeholder="Сколько" /><input id="pctB" type="number" placeholder="% от" /><button class="btn" id="pctGo">=</button></div>
+      <div class="res" id="pctOut">—</div>
+      <div class="muted" style="margin-top:10px">Случайное число</div>
+      <div class="row"><input id="rndA" type="number" value="1" /><input id="rndB" type="number" value="100" /><button class="btn" id="rndGo">🎲</button></div>
+      <div class="res" id="rndOut">—</div>
+    </section>
+
+    <section id="links" class="card hidden">
+      <div class="muted">Свои ссылки</div>
+      <div id="linkList" style="margin-top:6px"></div>
+      <div class="row"><input id="lName" placeholder="Название" /></div>
+      <div class="row"><input id="lUrl" placeholder="https://..." /><button class="btn primary" id="lAdd">+</button></div>
+    </section>
   </section>
 </main>
+
+<footer class="bottombar">
+  <span class="hot"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd></span>
+  <a class="open" id="openApp" href="#" target="_blank" rel="noopener">Открыть MTools ↗</a>
+</footer>
+
+<!-- НАСТРОЙКИ -->
+<div class="modal hidden" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Настройки расширения</h3>
+        <p class="muted">Синхронизация с сервисом и быстрые кнопки</p>
+      </div>
+      <button class="icon-btn" id="closeSettings">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="muted">Ключ синхронизации</label>
+        <div class="row">
+          <input id="syncToken" placeholder="Ключ из раздела «Расширение»" />
+          <button class="btn primary" id="syncGo">Подключить</button>
+        </div>
+        <div class="muted" id="syncState">Вставьте ключ, чтобы подтянуть свои инструменты из сервиса.</div>
+      </div>
+
+      <div class="field">
+        <label class="muted">Быстрые кнопки</label>
+        <p class="muted small">Выберите инструменты, которые будут отображаться в быстром доступе (до 8).</p>
+        <div class="check-list" id="quickConfig"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="resetQuick">Сбросить</button>
+      <button class="btn primary" id="saveQuick">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <script src="panel.js"></script>
 </body>
 </html>
