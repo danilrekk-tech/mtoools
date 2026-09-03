@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "MTools — панель инструментов",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Быстрый доступ к инструментам MTools из браузера и контекстного меню.",
-  "permissions": ["storage", "sidePanel", "contextMenus"],
+  "permissions": ["storage", "sidePanel", "contextMenus", "tabs"],
+  "host_permissions": ["https://mtoools.lovable.app/*"],
   "action": { "default_title": "MTools", "default_popup": "panel.html", "default_icon": "icon.png" },
   "side_panel": { "default_path": "panel.html" },
   "background": { "service_worker": "background.js" },
