@@ -5,17 +5,8 @@ import {
   Calendar,
   Timer,
   Wrench,
-  Send,
-  Shield,
   Settings,
-  Users,
-  Building2,
-  CalendarClock,
-  ScrollText,
-  Puzzle,
-  ChevronDown,
 } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
@@ -30,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { MToolsLogo } from "./logo";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { profileQuery, myDashboardQuery } from "@/lib/queries";
+import { myDashboardQuery } from "@/lib/queries";
 import { DynIcon } from "./icon";
 
 const mainItems = [
@@ -39,24 +30,11 @@ const mainItems = [
   { title: "Календарь", url: "/calendar", icon: Calendar },
   { title: "Учёт времени", url: "/time-tracker", icon: Timer },
   { title: "Инструменты", url: "/tools", icon: Wrench },
-  { title: "Telegram-бот", url: "/telegram", icon: Send },
-  { title: "Расширение Chrome", url: "/extension", icon: Puzzle },
-];
-
-const adminItems = [
-  { title: "Пользователи", url: "/admin/users", icon: Users },
-  { title: "Отделы", url: "/admin/departments", icon: Building2 },
-  { title: "Инструменты", url: "/admin/tools", icon: Wrench },
-  { title: "Смены и графики", url: "/admin/shifts", icon: CalendarClock },
-  { title: "Настройки бота", url: "/admin/telegram", icon: Send },
-  { title: "Аудит-лог", url: "/admin/audit", icon: ScrollText },
 ];
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const { data: me } = useSuspenseQuery(profileQuery());
   const { data: dash } = useSuspenseQuery(myDashboardQuery());
-  const isAdmin = me?.roles.includes("admin") ?? false;
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(p + "/"));
 
   const sidebarTools = (dash?.layouts ?? [])
