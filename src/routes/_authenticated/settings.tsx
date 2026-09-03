@@ -43,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function SettingsPage() {
   const qc = useQueryClient();
   const { data: me } = useSuspenseQuery(profileQuery());
+  const isAdmin = me?.roles.includes("admin") ?? false;
   const [name, setName] = useState(me?.profile?.full_name ?? "");
   const [pos, setPos] = useState(me?.profile?.position ?? "");
   const [tz, setTz] = useState(me?.profile?.timezone ?? "Europe/Moscow");
