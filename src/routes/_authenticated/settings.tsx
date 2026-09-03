@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { profileQuery } from "@/lib/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ShieldCheck } from "lucide-react";
+import {
+  ShieldCheck,
+  Shield,
+  Send,
+  Puzzle,
+  Users,
+  Building2,
+  Wrench,
+  CalendarClock,
+  ScrollText,
+} from "lucide-react";
+
+const integrations = [
+  { to: "/telegram", title: "Telegram-бот", desc: "Привязка аккаунта и уведомления", icon: Send },
+  { to: "/extension", title: "Расширение Chrome", desc: "Панель инструментов в браузере", icon: Puzzle },
+] as const;
+
+const adminLinks = [
+  { to: "/admin/users", title: "Пользователи", desc: "Роли и доступы", icon: Users },
+  { to: "/admin/departments", title: "Отделы", desc: "Структура компании", icon: Building2 },
+  { to: "/admin/tools", title: "Инструменты", desc: "Каталог и доступы", icon: Wrench },
+  { to: "/admin/shifts", title: "Смены и графики", desc: "Планировщик смен", icon: CalendarClock },
+  { to: "/admin/telegram", title: "Настройки бота", desc: "Команды и токен", icon: Send },
+  { to: "/admin/audit", title: "Аудит-лог", desc: "История действий", icon: ScrollText },
+] as const;
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -19,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function SettingsPage() {
   const qc = useQueryClient();
   const { data: me } = useSuspenseQuery(profileQuery());
+  const isAdmin = me?.roles.includes("admin") ?? false;
   const [name, setName] = useState(me?.profile?.full_name ?? "");
   const [pos, setPos] = useState(me?.profile?.position ?? "");
   const [tz, setTz] = useState(me?.profile?.timezone ?? "Europe/Moscow");
@@ -96,6 +121,50 @@ function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base">Интеграции</CardTitle></CardHeader>
+        <CardContent className="grid gap-2 sm:grid-cols-2">
+          {integrations.map((i) => (
+            <Link
+              key={i.to}
+              to={i.to}
+              className="flex items-center gap-3 rounded-lg border p-3 text-sm transition hover:bg-accent"
+            >
+              <i.icon className="h-4 w-4 text-primary" />
+              <div>
+                <div className="font-medium">{i.title}</div>
+                <div className="text-xs text-muted-foreground">{i.desc}</div>
+              </div>
+            </Link>
+          ))}
+        </CardContent>
+      </Card>
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4" /> Администрирование
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-2 sm:grid-cols-2">
+            {adminLinks.map((i) => (
+              <Link
+                key={i.to}
+                to={i.to}
+                className="flex items-center gap-3 rounded-lg border p-3 text-sm transition hover:bg-accent"
+              >
+                <i.icon className="h-4 w-4 text-primary" />
+                <div>
+                  <div className="font-medium">{i.title}</div>
+                  <div className="text-xs text-muted-foreground">{i.desc}</div>
+                </div>
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

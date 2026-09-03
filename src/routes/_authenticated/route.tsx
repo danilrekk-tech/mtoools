@@ -6,7 +6,12 @@ import { TopBar } from "@/components/mtools/topbar";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
+  // Session is read from local storage (instant); the network call only happens
+  // when no cached session exists, so tab-to-tab navigation stays instant.
   beforeLoad: async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData.session?.user;
+    if (user) return { user };
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
     return { user: data.user };

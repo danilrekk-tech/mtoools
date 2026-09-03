@@ -1,7 +1,18 @@
 import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+export function isEmojiIcon(name?: string | null) {
+  return Boolean(name && name.startsWith("emoji:"));
+}
+
 export function DynIcon({ name, className }: { name?: string | null; className?: string }) {
+  if (isEmojiIcon(name)) {
+    return (
+      <span className={`inline-flex items-center justify-center leading-none ${className ?? ""}`} aria-hidden>
+        <span style={{ fontSize: "1em", lineHeight: 1 }}>{name!.slice(6)}</span>
+      </span>
+    );
+  }
   const Comp = (name && (Icons as unknown as Record<string, LucideIcon>)[name]) || Icons.Wrench;
   return <Comp className={className} />;
 }
