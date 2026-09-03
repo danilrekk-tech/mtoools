@@ -6,7 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ShieldCheck } from "lucide-react";
+import {
+  ShieldCheck,
+  Shield,
+  Send,
+  Puzzle,
+  Users,
+  Building2,
+  Wrench,
+  CalendarClock,
+  ScrollText,
+} from "lucide-react";
+
+const integrations = [
+  { to: "/telegram", title: "Telegram-бот", desc: "Привязка аккаунта и уведомления", icon: Send },
+  { to: "/extension", title: "Расширение Chrome", desc: "Панель инструментов в браузере", icon: Puzzle },
+] as const;
+
+const adminLinks = [
+  { to: "/admin/users", title: "Пользователи", desc: "Роли и доступы", icon: Users },
+  { to: "/admin/departments", title: "Отделы", desc: "Структура компании", icon: Building2 },
+  { to: "/admin/tools", title: "Инструменты", desc: "Каталог и доступы", icon: Wrench },
+  { to: "/admin/shifts", title: "Смены и графики", desc: "Планировщик смен", icon: CalendarClock },
+  { to: "/admin/telegram", title: "Настройки бота", desc: "Команды и токен", icon: Send },
+  { to: "/admin/audit", title: "Аудит-лог", desc: "История действий", icon: ScrollText },
+] as const;
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
