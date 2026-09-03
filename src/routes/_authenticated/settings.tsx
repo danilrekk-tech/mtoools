@@ -96,6 +96,50 @@ function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base">Интеграции</CardTitle></CardHeader>
+        <CardContent className="grid gap-2 sm:grid-cols-2">
+          {integrations.map((i) => (
+            <Link
+              key={i.to}
+              to={i.to}
+              className="flex items-center gap-3 rounded-lg border p-3 text-sm transition hover:bg-accent"
+            >
+              <i.icon className="h-4 w-4 text-primary" />
+              <div>
+                <div className="font-medium">{i.title}</div>
+                <div className="text-xs text-muted-foreground">{i.desc}</div>
+              </div>
+            </Link>
+          ))}
+        </CardContent>
+      </Card>
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4" /> Администрирование
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-2 sm:grid-cols-2">
+            {adminLinks.map((i) => (
+              <Link
+                key={i.to}
+                to={i.to}
+                className="flex items-center gap-3 rounded-lg border p-3 text-sm transition hover:bg-accent"
+              >
+                <i.icon className="h-4 w-4 text-primary" />
+                <div>
+                  <div className="font-medium">{i.title}</div>
+                  <div className="text-xs text-muted-foreground">{i.desc}</div>
+                </div>
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
