@@ -57,12 +57,11 @@ function AuditPage() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div>
-          <h1 className="text-xl font-bold sm:text-2xl">Аудит-лог</h1>
-          <p className="text-sm text-muted-foreground">Все действия админов, изменения ролей, отделов и доступов.</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={() => setView(view === "cards" ? "table" : "cards")}>
+      <PageHeader
+        icon={ScrollText}
+        title="Аудит-лог"
+        subtitle="Все действия админов, изменения ролей, отделов и доступов."
+        actions={<Button variant="outline" size="sm" onClick={() => setView(view === "cards" ? "table" : "cards")}>
           {view === "cards" ? <Table2 className="mr-2 h-4 w-4" /> : <LayoutList className="mr-2 h-4 w-4" />}
           {view === "cards" ? "Таблица" : "Карточки"}
         </Button>
