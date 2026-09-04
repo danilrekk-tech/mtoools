@@ -62,3 +62,47 @@ export const broadcastTelegram = createServerFn({ method: "POST" })
     }
     return { ok: true, sent, total: recipients?.length ?? 0 };
   });
+async function requireAdmin(context: { supabase: any; userId: string }) {
+  const { data: rows } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+  if (!(rows ?? []).some((r: { role: string }) => r.role === "admin")) throw new Error("Только для админов");
+}
+
+const WEBHOOK_URL = "https://mtoools.lovable.app/api/public/telegram/webhook";
+
+async function webhookSecret() {
+  const tg = process.env.TELEGRAM_API_KEY;
+  if (!tg) throw new Error("Telegram-коннектор не подключён");
+  const { createHash } = await import("crypto");
+  return createHash("sha256").update(`telegram-webhook:${tg}`).digest("base64url");
+}
+
+/** Диагностика: бот отвечает? вебхук зарегистрирован на нашем адресе? */
+export const telegramStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context as never);
+    const me = await callTelegram("/getMe", {});
+    const info = await callTelegram("/getWebhookInfo", {});
+    return {
+      bot: me.result?.username ? `@${me.result.username}` : "—",
+      webhookUrl: info.result?.url ?? "",
+      expectedUrl: WEBHOOK_URL,
+      pendingUpdates: info.result?.pending_update_count ?? 0,
+      lastError: info.result?.last_error_message ?? null,
+      connected: info.result?.url === WEBHOOK_URL,
+    };
+  });
+
+/** Регистрирует webhook Telegram на публичный маршрут сервиса. */
+export const registerTelegramWebhook = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context as never);
+    await callTelegram("/setWebhook", {
+      url: WEBHOOK_URL,
+      secret_token: await webhookSecret(),
+      allowed_updates: ["message", "edited_message", "callback_query"],
+      drop_pending_updates: false,
+    });
+    return { ok: true, url: WEBHOOK_URL };
+  });
