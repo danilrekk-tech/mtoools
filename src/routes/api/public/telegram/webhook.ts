@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createHash, timingSafeEqual } from "crypto";
-import { createClient } from "@supabase/supabase-js";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/telegram";
 
@@ -42,9 +41,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           return Response.json({ ok: true, ignored: true });
         }
 
-        const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
+        const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
 
         await supabase.from("telegram_messages").upsert(
           {

@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createClient } from "@supabase/supabase-js";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/telegram";
 
@@ -23,9 +22,7 @@ export const Route = createFileRoute("/api/public/cron/dispatch-notifications")(
   server: {
     handlers: {
       POST: async () => {
-        const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
+        const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
         const { data: pending } = await supabase
           .from("notifications")
           .select("id, user_id, title, body, channel")

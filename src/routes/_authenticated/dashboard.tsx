@@ -44,6 +44,20 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "description", content: "Панель сотрудника MTools: задачи, инструменты, учёт времени." },
     ],
   }),
+  // Параллельный прогрев кэша — иначе useSuspenseQuery выполняются водопадом.
+  loader: async ({ context }) => {
+    const qc = context.queryClient;
+    await Promise.all([
+      qc.ensureQueryData(profileQuery()),
+      qc.ensureQueryData(myDashboardQuery()),
+      qc.ensureQueryData(tasksQuery()),
+      qc.ensureQueryData(activeTimeEntryQuery()),
+      qc.ensureQueryData(shiftsQuery()),
+      qc.ensureQueryData(timeEntriesQuery()),
+      qc.ensureQueryData(notificationsQuery()),
+    ]);
+  },
+  errorComponent: ({ error }) => <div role="alert" className="p-4 text-sm text-destructive">{error.message}</div>,
   component: Dashboard,
 });
 

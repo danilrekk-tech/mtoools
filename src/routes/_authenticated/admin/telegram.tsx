@@ -12,8 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useServerFn } from "@tanstack/react-start";
-import { broadcastTelegram } from "@/lib/telegram.functions";
-import { Send } from "lucide-react";
+import { broadcastTelegram, telegramStatus, registerTelegramWebhook } from "@/lib/telegram.functions";
+import { Send, PlugZap, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/admin/telegram")({
   head: () => ({ meta: [{ title: "Telegram · Админ · MTools" }, { name: "description", content: "Настройки бота по отделам." }] }),
@@ -54,6 +55,22 @@ function AdminTelegram() {
     toast.success("Обновлено");
   };
 
+  const getStatus = useServerFn(telegramStatus);
+  const registerHook = useServerFn(registerTelegramWebhook);
+  const [status, setStatus] = useState<any>(null);
+  const [busy, setBusy] = useState(false);
+  const check = async () => {
+    setBusy(true);
+    try { setStatus(await getStatus({})); } catch (e: any) { toast.error(e.message); setStatus(null); }
+    setBusy(false);
+  };
+  const register = async () => {
+    setBusy(true);
+    try { await registerHook({}); toast.success("Webhook зарегистрирован"); await check(); }
+    catch (e: any) { toast.error(e.message); }
+    setBusy(false);
+  };
+
   const broadcast = useServerFn(broadcastTelegram);
   const [msg, setMsg] = useState("");
   const [target, setTarget] = useState<string>("all");
@@ -76,6 +93,7 @@ function AdminTelegram() {
         <TabsList>
           <TabsTrigger value="features">Функции отделов</TabsTrigger>
           <TabsTrigger value="broadcast">Рассылка</TabsTrigger>
+          <TabsTrigger value="status">Диагностика</TabsTrigger>
         </TabsList>
         <TabsContent value="features" className="mt-4">
       <p className="text-sm text-muted-foreground">Включённые функции применяются ко всем сотрудникам отдела по умолчанию.</p>
@@ -120,6 +138,37 @@ function AdminTelegram() {
                 <Send className="mr-2 h-4 w-4" />{sending ? "Отправка…" : "Отправить"}
               </Button>
               <p className="text-xs text-muted-foreground">Сообщение получат только сотрудники с привязанным Telegram.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="status" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <CardTitle className="flex items-center gap-2 text-base"><PlugZap className="h-4 w-4" /> Состояние интеграции</CardTitle>
+              <Button size="sm" variant="outline" onClick={check} disabled={busy}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${busy ? "animate-spin" : ""}`} /> Проверить
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              {!status && <p className="text-muted-foreground">Нажмите «Проверить», чтобы опросить бота.</p>}
+              {status && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline">Бот: {status.bot}</Badge>
+                    <Badge variant={status.connected ? "default" : "destructive"} className="gap-1">
+                      {status.connected ? <CheckCircle2 className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
+                      {status.connected ? "Webhook активен" : "Webhook не привязан"}
+                    </Badge>
+                    <Badge variant="outline">В очереди: {status.pendingUpdates}</Badge>
+                  </div>
+                  <div className="break-all rounded-md border p-3 text-xs text-muted-foreground">
+                    <div>Текущий URL: {status.webhookUrl || "—"}</div>
+                    <div>Ожидаемый: {status.expectedUrl}</div>
+                    {status.lastError && <div className="mt-1 text-destructive">Ошибка Telegram: {status.lastError}</div>}
+                  </div>
+                </>
+              )}
+              <Button onClick={register} disabled={busy}>Зарегистрировать webhook</Button>
             </CardContent>
           </Card>
         </TabsContent>

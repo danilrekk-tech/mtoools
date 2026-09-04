@@ -1,12 +1,17 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+/** Локальное чтение сессии (без сетевого запроса) — критично для скорости первой отрисовки. */
+async function currentUser() {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user ?? null;
+}
+
 export const profileQuery = () =>
   queryOptions({
     queryKey: ["me", "profile"],
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
+      const user = await currentUser();
       if (!user) return null;
       const [{ data: profile }, { data: roles }] = await Promise.all([
         supabase.from("profiles").select("*, department:departments(*)").eq("id", user.id).maybeSingle(),
@@ -62,8 +67,7 @@ export const myDashboardQuery = () =>
   queryOptions({
     queryKey: ["me", "dashboard"],
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const uid = userData.user?.id;
+      const uid = (await currentUser())?.id;
       if (!uid) return { tools: [], layouts: [] };
       const [{ data: prof }, { data: allTools }, { data: layouts }, { data: overrides }] = await Promise.all([
         supabase.from("profiles").select("department_id").eq("id", uid).maybeSingle(),
@@ -115,8 +119,7 @@ export const activeTimeEntryQuery = () =>
   queryOptions({
     queryKey: ["me", "time-entry", "active"],
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const uid = userData.user?.id;
+      const uid = (await currentUser())?.id;
       if (!uid) return null;
       const { data } = await supabase.from("time_entries").select("*").eq("user_id", uid).is("ended_at", null).order("started_at", { ascending: false }).limit(1).maybeSingle();
       return data;
@@ -127,8 +130,7 @@ export const notificationsQuery = () =>
   queryOptions({
     queryKey: ["me", "notifications"],
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const uid = userData.user?.id;
+      const uid = (await currentUser())?.id;
       if (!uid) return [];
       const { data } = await supabase
         .from("notifications")
@@ -157,8 +159,7 @@ export const timeEntriesQuery = () =>
   queryOptions({
     queryKey: ["me", "time-entries"],
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const uid = userData.user?.id;
+      const uid = (await currentUser())?.id;
       if (!uid) return [];
       const { data } = await supabase
         .from("time_entries")
