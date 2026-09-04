@@ -8,7 +8,8 @@ import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { LayoutList, Table2 } from "lucide-react";
+import { LayoutList, Table2, ScrollText } from "lucide-react";
+import { PageHeader } from "@/components/mtools/page-header";
 import { UserAvatar } from "@/components/mtools/user-avatar";
 import { describeAudit, ENTITY_LABELS } from "@/lib/audit-text";
 
@@ -64,8 +65,8 @@ function AuditPage() {
         actions={<Button variant="outline" size="sm" onClick={() => setView(view === "cards" ? "table" : "cards")}>
           {view === "cards" ? <Table2 className="mr-2 h-4 w-4" /> : <LayoutList className="mr-2 h-4 w-4" />}
           {view === "cards" ? "Таблица" : "Карточки"}
-        </Button>
-      </div>
+        </Button>}
+      />
       <div className="grid gap-2 sm:grid-cols-[1fr_220px]">
         <Input placeholder="Поиск по событию…" value={search} onChange={(e) => setSearch(e.target.value)} />
         <Select value={entity} onValueChange={setEntity}>

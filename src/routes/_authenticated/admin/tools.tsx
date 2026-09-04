@@ -98,9 +98,11 @@ function AdminTools() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-bold sm:text-2xl">Инструменты</h1>
-        <div className="flex items-center gap-2">
+      <PageHeader
+        icon={Wrench}
+        title="Инструменты"
+        subtitle={`${tools.length} инструментов и сервисов`}
+        actions={<>
           <ViewToggle view={view} onChange={setView} locked={locked} />
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button className="gradient-brand text-white" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Новый</Button></DialogTrigger>
