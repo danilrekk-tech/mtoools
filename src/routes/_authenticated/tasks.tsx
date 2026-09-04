@@ -26,6 +26,11 @@ export const Route = createFileRoute("/_authenticated/tasks")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: async ({ context }) => {
+    const qc = context.queryClient;
+    await Promise.all([qc.ensureQueryData(profileQuery()), qc.ensureQueryData(tasksQuery())]);
+  },
+  errorComponent: ({ error }) => <div role="alert" className="p-4 text-sm text-destructive">{error.message}</div>,
   component: TasksPage,
 });
 

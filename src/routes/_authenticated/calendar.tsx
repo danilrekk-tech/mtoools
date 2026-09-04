@@ -16,6 +16,15 @@ export const Route = createFileRoute("/_authenticated/calendar")({
       { name: "description", content: "График смен и событий сотрудника." },
     ],
   }),
+  loader: async ({ context }) => {
+    const qc = context.queryClient;
+    await Promise.all([
+      qc.ensureQueryData(profileQuery()),
+      qc.ensureQueryData(shiftsQuery()),
+      qc.ensureQueryData(tasksQuery()),
+    ]);
+  },
+  errorComponent: ({ error }) => <div role="alert" className="p-4 text-sm text-destructive">{error.message}</div>,
   component: CalendarPage,
 });
 
