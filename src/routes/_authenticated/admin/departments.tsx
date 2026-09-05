@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Building2 } from "lucide-react";
+import { PageHeader } from "@/components/mtools/page-header";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -65,8 +66,11 @@ function AdminDepartments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Отделы</h1>
+      <PageHeader
+        icon={Building2}
+        title="Отделы"
+        subtitle={`${departments.length} отделов`}
+        actions={
         <Dialog>
           <DialogTrigger asChild><Button className="gradient-brand text-white"><Plus className="mr-2 h-4 w-4" />Новый отдел</Button></DialogTrigger>
           <DialogContent>
@@ -77,8 +81,8 @@ function AdminDepartments() {
               <Button onClick={create} className="w-full gradient-brand text-white">Создать</Button>
             </div>
           </DialogContent>
-        </Dialog>
-      </div>
+        </Dialog>}
+      />
       <div className="space-y-3">
         {departments.map((d: any) => (
           <Card key={d.id}>

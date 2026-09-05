@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useServerFn } from "@tanstack/react-start";
 import { broadcastTelegram, telegramStatus, registerTelegramWebhook } from "@/lib/telegram.functions";
-import { Send, PlugZap, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Send, PlugZap, CheckCircle2, AlertTriangle, RefreshCw, Bot } from "lucide-react";
+import { PageHeader } from "@/components/mtools/page-header";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/admin/telegram")({
@@ -88,7 +89,7 @@ function AdminTelegram() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold sm:text-2xl">Telegram-бот</h1>
+      <PageHeader icon={Bot} title="Telegram-бот" subtitle="Функции отделов, рассылки и диагностика" />
       <Tabs defaultValue="features">
         <TabsList>
           <TabsTrigger value="features">Функции отделов</TabsTrigger>

@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Play, Search, AlarmClock } from "lucide-react";
+import { Plus, Trash2, Play, Search, AlarmClock, ListChecks } from "lucide-react";
+import { PageHeader } from "@/components/mtools/page-header";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -143,14 +144,11 @@ function TasksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold sm:text-2xl">Задачи</h1>
-          <p className="text-sm text-muted-foreground">
-            {filtered.filter((t) => t.status !== "done").length} открытых ·{" "}
-            {filtered.filter((t) => overdue(t)).length} просрочено
-          </p>
-        </div>
+      <PageHeader
+        icon={ListChecks}
+        title="Задачи"
+        subtitle={`${filtered.filter((t) => t.status !== "done").length} открытых · ${filtered.filter((t) => overdue(t)).length} просрочено`}
+        actions={<>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gradient-brand text-white"><Plus className="mr-2 h-4 w-4" />Задача</Button>
@@ -193,8 +191,8 @@ function TasksPage() {
             </div>
             <DialogFooter><Button onClick={create} className="gradient-brand text-white">Создать</Button></DialogFooter>
           </DialogContent>
-        </Dialog>
-      </div>
+        </Dialog></>}
+      />
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
