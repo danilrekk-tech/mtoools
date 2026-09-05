@@ -201,8 +201,8 @@ function AdminTools() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
+        </>}
+      />
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
