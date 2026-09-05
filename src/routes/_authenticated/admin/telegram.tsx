@@ -89,7 +89,7 @@ function AdminTelegram() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold sm:text-2xl">Telegram-бот</h1>
+      <PageHeader icon={Bot} title="Telegram-бот" subtitle="Функции отделов, рассылки и диагностика" />
       <Tabs defaultValue="features">
         <TabsList>
           <TabsTrigger value="features">Функции отделов</TabsTrigger>
