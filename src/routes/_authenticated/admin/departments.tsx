@@ -66,8 +66,11 @@ function AdminDepartments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Отделы</h1>
+      <PageHeader
+        icon={Building2}
+        title="Отделы"
+        subtitle={`${departments.length} отделов`}
+        actions={
         <Dialog>
           <DialogTrigger asChild><Button className="gradient-brand text-white"><Plus className="mr-2 h-4 w-4" />Новый отдел</Button></DialogTrigger>
           <DialogContent>
@@ -78,8 +81,8 @@ function AdminDepartments() {
               <Button onClick={create} className="w-full gradient-brand text-white">Создать</Button>
             </div>
           </DialogContent>
-        </Dialog>
-      </div>
+        </Dialog>}
+      />
       <div className="space-y-3">
         {departments.map((d: any) => (
           <Card key={d.id}>
