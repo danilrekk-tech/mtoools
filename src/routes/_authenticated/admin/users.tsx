@@ -107,13 +107,15 @@ function AdminUsers() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <h1 className="text-xl font-bold sm:text-2xl">Пользователи</h1>
-        <div className="flex items-center gap-2">
+      <PageHeader
+        icon={UsersIcon}
+        title="Пользователи"
+        subtitle={`${users.length} сотрудников`}
+        actions={<>
           <ViewToggle view={view} onChange={setView} locked={locked} />
           <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />CSV</Button>
-        </div>
-      </div>
+        </>}
+      />
 
 
       <div className="grid gap-4 sm:grid-cols-3">
