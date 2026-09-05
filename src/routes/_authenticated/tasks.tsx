@@ -194,8 +194,8 @@ function TasksPage() {
             </div>
             <DialogFooter><Button onClick={create} className="gradient-brand text-white">Создать</Button></DialogFooter>
           </DialogContent>
-        </Dialog>
-      </div>
+        </Dialog></>}
+      />
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
