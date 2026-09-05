@@ -115,12 +115,11 @@ function CalendarPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold sm:text-2xl">Календарь и смены</h1>
-          <p className="text-sm text-muted-foreground">{isManager ? "Все смены команды" : "Ваш график"}</p>
-        </div>
-        <div className="flex shrink-0 gap-2">
+      <PageHeader
+        icon={CalendarDays}
+        title="Календарь и смены"
+        subtitle={isManager ? "Все смены команды" : "Ваш график"}
+        actions={<>
           <Button size="icon" variant="outline" onClick={() => shiftMonth(-1)} aria-label="Предыдущий месяц">
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -128,8 +127,8 @@ function CalendarPage() {
           <Button size="icon" variant="outline" onClick={() => shiftMonth(1)} aria-label="Следующий месяц">
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
-      </div>
+        </>}
+      />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
