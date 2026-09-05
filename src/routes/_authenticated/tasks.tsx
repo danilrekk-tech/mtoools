@@ -144,14 +144,11 @@ function TasksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold sm:text-2xl">Задачи</h1>
-          <p className="text-sm text-muted-foreground">
-            {filtered.filter((t) => t.status !== "done").length} открытых ·{" "}
-            {filtered.filter((t) => overdue(t)).length} просрочено
-          </p>
-        </div>
+      <PageHeader
+        icon={ListChecks}
+        title="Задачи"
+        subtitle={`${filtered.filter((t) => t.status !== "done").length} открытых · ${filtered.filter((t) => overdue(t)).length} просрочено`}
+        actions={<>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gradient-brand text-white"><Plus className="mr-2 h-4 w-4" />Задача</Button>
