@@ -149,17 +149,16 @@ function AdminShifts() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold sm:text-2xl">Планировщик смен</h1>
-          <p className="text-xs capitalize text-muted-foreground sm:text-sm">{label}</p>
-        </div>
-        <div className="flex shrink-0 gap-2">
+      <PageHeader
+        icon={CalendarRange}
+        title="Планировщик смен"
+        subtitle={<span className="capitalize">{label}</span>}
+        actions={<>
           <Button size="icon" variant="outline" onClick={() => step(-1)} aria-label="Назад"><ChevronLeft className="h-4 w-4" /></Button>
           <Button size="sm" variant="outline" onClick={() => setAnchor(startOfDay(new Date()))}>Сегодня</Button>
           <Button size="icon" variant="outline" onClick={() => step(1)} aria-label="Вперёд"><ChevronRight className="h-4 w-4" /></Button>
-        </div>
-      </div>
+        </>}
+      />
 
       <div className="flex flex-wrap items-center gap-3">
         <Tabs value={mode} onValueChange={(v) => setMode(v as ViewMode)}>
