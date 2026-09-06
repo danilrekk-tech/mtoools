@@ -18,8 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { MToolsLogo } from "./logo";
+import { MToolsLogo, MToolsMark } from "./logo";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { myDashboardQuery } from "@/lib/queries";
 import { DynIcon } from "./icon";
@@ -34,6 +35,8 @@ const mainItems = [
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const { state, isMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
   const { data: dash } = useSuspenseQuery(myDashboardQuery());
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(p + "/"));
 
