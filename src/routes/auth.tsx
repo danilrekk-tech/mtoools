@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { MToolsLogo } from "@/components/mtools/logo";
+import InkReveal from "@/components/ui/ink-reveal";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -72,19 +73,16 @@ function AuthPage() {
   };
 
   return (
-    <div className="mtools-shell grid min-h-screen md:grid-cols-2">
-      <div className="hidden gradient-brand p-10 text-white md:flex md:flex-col md:justify-between">
-        <MToolsLogo className="h-10 brightness-0 invert" />
-        <div>
-          <h2 className="text-3xl font-bold leading-tight">Единое рабочее пространство<br />вашей компании</h2>
-          <p className="mt-4 text-white/80">Задачи, инструменты, календарь смен и Telegram-бот с учётом отдела.</p>
-        </div>
-        <div className="text-sm text-white/60">© MTools</div>
-      </div>
-      <div className="flex items-center justify-center bg-background p-6">
-        <Card className="w-full max-w-md border-white/10 bg-card/90 p-6 shadow-[0_22px_60px_rgba(0,0,0,0.20)] backdrop-blur-xl">
-          <div className="mb-6 flex flex-col items-center gap-2 md:hidden">
-            <MToolsLogo className="h-10" />
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      <div className="absolute inset-0 gradient-brand" aria-hidden />
+      <InkReveal maskColor={[252, 250, 248]} brushSize={150} />
+      <div className="pointer-events-none relative z-10 flex min-h-screen items-center justify-center p-6">
+        <Card className="pointer-events-auto w-full max-w-md border-border/60 bg-card/90 p-6 shadow-[0_22px_60px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+          <div className="mb-6 flex flex-col items-center gap-2">
+            <MToolsLogo className="text-4xl" />
+            <p className="text-center text-sm text-muted-foreground">
+              Единое рабочее пространство вашей компании
+            </p>
           </div>
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2">
