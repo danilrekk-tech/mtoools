@@ -48,8 +48,12 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border/70 px-2">
-        <Link to="/" className="flex items-center gap-2 rounded-xl px-2 py-3">
-          <MToolsLogo className="text-2xl" />
+        <Link
+          to="/"
+          aria-label="MTools"
+          className={`flex items-center rounded-xl py-3 transition-all ${collapsed ? "justify-center px-0" : "px-2"}`}
+        >
+          {collapsed ? <MToolsMark /> : <MToolsLogo className="text-3xl" />}
         </Link>
       </SidebarHeader>
       <SidebarContent>
