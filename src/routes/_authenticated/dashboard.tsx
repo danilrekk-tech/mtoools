@@ -47,7 +47,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   // Параллельный прогрев кэша — иначе useSuspenseQuery выполняются водопадом.
   loader: async ({ context }) => {
     const qc = context.queryClient;
-    await Promise.all([
+    // allSettled: сбой одного запроса не должен ронять всю страницу —
+    // компонент повторит запрос сам.
+    await Promise.allSettled([
       qc.ensureQueryData(profileQuery()),
       qc.ensureQueryData(myDashboardQuery()),
       qc.ensureQueryData(tasksQuery()),
@@ -57,7 +59,13 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       qc.ensureQueryData(notificationsQuery()),
     ]);
   },
-  errorComponent: ({ error }) => <div role="alert" className="p-4 text-sm text-destructive">{error.message}</div>,
+  errorComponent: ({ error, reset }) => (
+    <div role="alert" className="mx-auto mt-10 max-w-md rounded-2xl border bg-card p-6 text-center">
+      <p className="text-sm font-medium text-foreground">Не удалось загрузить панель</p>
+      <p className="mt-1 text-xs text-muted-foreground">{error.message}</p>
+      <Button className="mt-4" onClick={() => reset()}>Повторить</Button>
+    </div>
+  ),
   component: Dashboard,
 });
 
