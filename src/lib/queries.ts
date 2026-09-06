@@ -4,7 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 /** Локальное чтение сессии (без сетевого запроса) — критично для скорости первой отрисовки. */
 async function currentUser() {
   const { data } = await supabase.auth.getSession();
-  return data.session?.user ?? null;
+  if (data.session?.user) return data.session.user;
+  // Сессия ещё не восстановлена из хранилища — единственный сетевой фолбэк,
+  // без него дашборд иногда рендерится пустым/падает при гонке загрузки.
+  const { data: userData } = await supabase.auth.getUser();
+  return userData.user ?? null;
 }
 
 export const profileQuery = () =>
