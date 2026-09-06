@@ -18,8 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { MToolsLogo } from "./logo";
+import { MToolsLogo, MToolsMark } from "./logo";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { myDashboardQuery } from "@/lib/queries";
 import { DynIcon } from "./icon";
@@ -34,6 +35,8 @@ const mainItems = [
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const { state, isMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
   const { data: dash } = useSuspenseQuery(myDashboardQuery());
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(p + "/"));
 
@@ -45,8 +48,12 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border/70 px-2">
-        <Link to="/" className="flex items-center gap-2 rounded-xl px-2 py-3">
-          <MToolsLogo className="text-2xl" />
+        <Link
+          to="/"
+          aria-label="MTools"
+          className={`flex items-center rounded-xl py-3 transition-all ${collapsed ? "justify-center px-0" : "px-2"}`}
+        >
+          {collapsed ? <MToolsMark /> : <MToolsLogo className="text-3xl" />}
         </Link>
       </SidebarHeader>
       <SidebarContent>

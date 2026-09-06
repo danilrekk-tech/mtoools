@@ -1,29 +1,36 @@
+import { cn } from "@/lib/utils";
+
+/**
+ * Текстовый логотип MTools: буква M — акцентным цветом системы,
+ * остальное — цветом текста. Размер задаётся через className (text-*).
+ */
 export function MToolsLogo({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex select-none items-baseline font-black leading-none tracking-tight ${className}`}
+      className={cn(
+        "inline-flex select-none items-baseline font-black leading-none tracking-[-0.04em]",
+        className,
+      )}
       aria-label="MTools"
     >
-      <span
-        className="bg-clip-text text-transparent"
-        style={{
-          backgroundImage:
-            "linear-gradient(135deg, oklch(0.47 0.19 264) 0%, oklch(0.68 0.17 152) 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        M
-      </span>
+      <span className="text-primary">M</span>
       <span className="text-foreground">tools</span>
     </span>
   );
 }
 
-export function MToolsMark({ className = "h-8 w-8" }: { className?: string }) {
+/** Компактный знак для свёрнутого бокового меню. */
+export function MToolsMark({ className = "" }: { className?: string }) {
   return (
-    <div className={`${className} relative inline-flex items-center justify-center rounded-lg gradient-brand font-black text-white`}>
-      <span className="text-sm leading-none">M</span>
-    </div>
+    <span
+      className={cn(
+        "inline-flex select-none items-center justify-center rounded-xl bg-primary/12 font-black leading-none tracking-[-0.04em] text-primary ring-1 ring-primary/25",
+        "h-9 w-9 text-xl",
+        className,
+      )}
+      aria-label="MTools"
+    >
+      M
+    </span>
   );
 }
