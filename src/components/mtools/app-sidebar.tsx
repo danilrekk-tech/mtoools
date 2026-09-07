@@ -26,7 +26,7 @@ import { myDashboardQuery } from "@/lib/queries";
 import { DynIcon } from "./icon";
 
 const mainItems = [
-  { title: "Главная", url: "/", icon: LayoutDashboard },
+  { title: "Главная", url: "/dashboard", icon: LayoutDashboard },
   { title: "Мои задачи", url: "/tasks", icon: ListTodo },
   { title: "Календарь", url: "/calendar", icon: Calendar },
   { title: "Учёт времени", url: "/time-tracker", icon: Timer },
